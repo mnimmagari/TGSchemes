@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Rythu Bharosa - GOs & Circulars",
+    "url": "https://www.rythubharosa.telangana.gov.in/gos_circulars.aspx",
+    "allLinksRelevant": true,
+    "enabled": true
+  },
+  {
+    "name": "Telangana Agriculture Department",
+    "url": "https://agri.telangana.gov.in/",
+    "enabled": true
+  },
+  {
+    "name": "Telangana State Portal - News",
+    "url": "https://www.telangana.gov.in/news/",
+    "enabled": true
+  },
+  {
+    "name": "Telangana I&PR",
+    "url": "https://ipr.telangana.gov.in/",
+    "enabled": true
+  },
+  {
+    "name": "PM-KISAN",
+    "url": "https://pmkisan.gov.in/",
+    "enabled": true
+  },
+  {
+    "name": "Ministry of Agriculture & Farmers Welfare",
+    "url": "https://agriwelfare.gov.in/",
+    "enabled": true
+  },
+  {
+    "name": "PIB - Ministry of Agriculture RSS",
+    "url": "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3",
+    "enabled": false,
+    "note": "Enable after confirming this RSS address returns agriculture releases."
+  }
+]

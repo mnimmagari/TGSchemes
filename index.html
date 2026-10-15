@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PMEAwcaSWBXA2LkN/sMrSaZX+/LGHThSo+3TcQquXbg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#1F4D2B">
 <meta name="description" content="Telangana and Central Government farmer announcements in simple Telugu and English.">
 <title>రైతు సమాచారం · Telangana Farmer Alerts</title>
@@ -350,6 +351,7 @@ const STATES = {
 const FULLTEXT = {full:'పూర్తిగా చదివాం · Full notice read', partial:'కొంత భాగమే · Partly read', scanned:'సమీక్ష అవసరం · Needs review'};
 
 let feedAlerts = [], localAlerts = [], feedMeta = null, topic = 'All';
+const BASE_TITLE = document.title;
 
 /* ---------- helpers ---------- */
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -438,9 +440,14 @@ async function loadFeed() {
 function renderCheck() {
   const bar = $('#checkBar'), text = $('#checkText');
   if (feedMeta && feedMeta.lastChecked) {
-    bar.classList.remove('off');
-    text.textContent = `చివరి తనిఖీ: ${dayLabel(feedMeta.lastChecked)} ${timeLabel(feedMeta.lastChecked)} · తదుపరి: ${nextCheckLabel()}`;
-    $('#checkEn').textContent = 'Checked automatically every day at 10 AM and 6 PM';
+    // Longest normal gap is 16 h (6 PM -> 10 AM); allow 2 h for GitHub scheduling delays.
+    const late = (Date.now() - feedMeta.lastChecked.getTime()) > 18 * 3600e3;
+    bar.classList.toggle('off', late);
+    const when = `${dayLabel(feedMeta.lastChecked)} ${timeLabel(feedMeta.lastChecked)}`;
+    text.textContent = late ? `చివరి తనిఖీ ఆలస్యమైంది: ${when}` : `చివరి తనిఖీ: ${when} · తదుపరి: ${nextCheckLabel()}`;
+    $('#checkEn').textContent = late
+      ? 'The last scheduled check is late, so new notices may be missing. Check the official websites below.'
+      : 'Checked automatically every day at 10 AM and 6 PM';
   } else {
     bar.classList.add('off');
     text.textContent = 'ఆటోమేటిక్ తనిఖీ ఇంకా ప్రారంభం కాలేదు';
@@ -506,6 +513,7 @@ function render() {
   const newN = all.filter(isNew).length;
   $('#newCount').hidden = !newN; $('#newCount').textContent = `${newN} కొత్తవి`;
   $('#bellDot').hidden = !newN; $('#bellDot').textContent = newN;
+  document.title = (newN ? `(${newN}) ` : '') + BASE_TITLE;
 
   $('#empty').hidden = shown.length > 0;
   if (!shown.length) {
