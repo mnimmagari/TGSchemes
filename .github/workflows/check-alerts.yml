@@ -43,7 +43,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}   # only used when AI_PROVIDER=anthropic
           MAX_NEW_PER_RUN: "8"
         run: python scripts/collect.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: alert-data
           path: |
