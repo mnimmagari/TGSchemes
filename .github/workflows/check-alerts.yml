@@ -27,7 +27,7 @@ jobs:
       models: read           # free GitHub Models inference with the automatic token
     steps:
       # TODO(security): pin each action to a full commit SHA (see README).
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-python@v5
@@ -60,7 +60,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
       - uses: actions/download-artifact@v4
@@ -99,7 +99,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
           persist-credentials: false
