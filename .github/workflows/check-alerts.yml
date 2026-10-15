@@ -17,17 +17,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 1) Reads untrusted web pages and PDFs. Has NO write access to the repository.
   collect:
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
-      contents: write        # only to commit data/*.json
+      contents: read
+      models: read           # free GitHub Models inference with the automatic token
     steps:
       # TODO(security): pin each action to a full commit SHA (see README).
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false   # no write token on disk while untrusted PDFs are parsed
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -35,13 +37,41 @@ jobs:
         run: python -m pip install --no-cache-dir -r requirements.txt
       - name: Check official sources and summarise new notices
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'github' }}      # set repo variable to "anthropic" to use Claude
+          AI_MODEL: ${{ vars.AI_MODEL }}                        # optional override, e.g. openai/gpt-4.1-mini
+          MODELS_TOKEN: ${{ secrets.MODELS_TOKEN || github.token }}  # PAT only needed if your org blocks the default
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}   # only used when AI_PROVIDER=anthropic
           MAX_NEW_PER_RUN: "8"
         run: python scripts/collect.py
-      - name: Save updated alerts
-        env:
-          GH_TOKEN: ${{ github.token }}   # write token exists only in this step
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alert-data
+          path: |
+            data/alerts.json
+            data/archive.json
+            data/seen.json
+          retention-days: 1
+
+  # 2) Commits the new data. Never runs the collector or parses downloaded files.
+  save:
+    needs: collect
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          name: alert-data
+          path: data
+      - name: Validate and commit
         run: |
+          for f in data/alerts.json data/archive.json data/seen.json; do
+            python3 -m json.tool "$f" > /dev/null   # refuse to commit malformed data
+          done
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/alerts.json data/archive.json data/seen.json
@@ -49,14 +79,16 @@ jobs:
             echo "No changes."
           else
             git commit -m "Update farmer alerts ($(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M IST'))"
-            REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
-            git pull --rebase --autostash "$REMOTE" main
-            git push "$REMOTE" HEAD:main
+            git push origin HEAD:main
           fi
 
+  # 3) Publishes the page and its public data to GitHub Pages.
   deploy:
-    needs: collect
-    if: always() && (needs.collect.result == 'success' || needs.collect.result == 'skipped')
+    needs: [collect, save]
+    if: >-
+      always() &&
+      contains(fromJSON('["success","skipped"]'), needs.collect.result) &&
+      contains(fromJSON('["success","skipped"]'), needs.save.result)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -69,7 +101,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main          # include the data commit made by the collect job
+          ref: main
+          persist-credentials: false
       - name: Build site folder (page + public data only)
         run: |
           mkdir -p _site/data

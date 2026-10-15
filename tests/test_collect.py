@@ -179,8 +179,8 @@ class CollectorTests(unittest.TestCase):
                 mock.patch.object(collect, "ARCHIVE_FILE", tmp / "archive.json"),
                 mock.patch.object(collect, "SEEN_FILE", tmp / "seen.json"),
                 mock.patch.object(collect, "SOURCES_FILE", tmp / "sources.json"),
-                mock.patch.object(collect, "call_claude", side_effect=fake_ai),
-                mock.patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}),
+                mock.patch.object(collect, "call_ai", side_effect=fake_ai),
+                mock.patch.dict("os.environ", {"MODELS_TOKEN": "test-token", "AI_PROVIDER": "github"}),
             ]
             for p in patches:
                 p.start()
@@ -203,8 +203,48 @@ class CollectorTests(unittest.TestCase):
                     p.stop()
 
     def test_missing_key_fails_securely(self):
-        with mock.patch.dict("os.environ", {"ANTHROPIC_API_KEY": ""}):
+        with mock.patch.dict("os.environ", {"MODELS_TOKEN": "", "ANTHROPIC_API_KEY": "", "AI_PROVIDER": "github"}):
             self.assertEqual(collect.run(), 1)
+        with mock.patch.dict("os.environ", {"MODELS_TOKEN": "x", "ANTHROPIC_API_KEY": "", "AI_PROVIDER": "anthropic"}):
+            self.assertEqual(collect.run(), 1)   # provider switch needs its own key
+
+    def test_github_models_request(self):
+        captured = {}
+
+        class AIHandler(http.server.BaseHTTPRequestHandler):
+            def log_message(self, *a):
+                pass
+
+            def do_POST(self):
+                captured["auth"] = self.headers.get("Authorization")
+                captured["body"] = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                reply = {"choices": [{"message": {"role": "assistant", "content": fake_ai("doc", "G.O.", "u", "k")}}]}
+                out = json.dumps(reply).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(out)))
+                self.end_headers()
+                self.wfile.write(out)
+
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), AIHandler)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        try:
+            with mock.patch.object(collect, "GITHUB_MODELS_URL", f"http://127.0.0.1:{srv.server_address[1]}/x"), \
+                 mock.patch.dict("os.environ", {"AI_PROVIDER": "github", "AI_MODEL": ""}):
+                raw = collect.call_ai("notice text", "G.O.", "https://agri.telangana.gov.in/a.pdf", "tok123")
+        finally:
+            srv.shutdown()
+            srv.server_close()
+        self.assertEqual(captured["auth"], "Bearer tok123")
+        self.assertEqual(captured["body"]["messages"][0]["role"], "system")
+        self.assertIn("<document>", captured["body"]["messages"][1]["content"])
+        self.assertTrue(collect.parse_summary(raw)["relevant"])
+
+    def test_text_cap_by_provider(self):
+        with mock.patch.dict("os.environ", {"AI_PROVIDER": "github"}):
+            self.assertEqual(collect.text_cap(), 16_000)
+        with mock.patch.dict("os.environ", {"AI_PROVIDER": "anthropic"}):
+            self.assertEqual(collect.text_cap(), 60_000)
 
     # ---- retention --------------------------------------------------------
     def test_expiry_and_archive(self):

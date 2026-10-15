@@ -7,13 +7,15 @@ Runs on GitHub Actions at 10:00 and 18:00 IST. For each official source page it:
      government domains only,
   2. skips anything already processed (data/seen.json),
   3. downloads and reads the FULL notice (all PDF pages up to a limit, or the web page),
-  4. asks Claude for Telugu-first, then English, farmer-focused key points,
+  4. asks an AI model (free GitHub Models by default, or the Claude API) for
+     Telugu-first, then English, farmer-focused key points,
   5. strictly validates the answer and adds it to data/alerts.json marked
      review="auto" ("AI summary - verify"),
   6. marks passed deadlines as expired and moves alerts older than 90 days to
      data/archive.json (history is never silently deleted).
 
-Secrets: ANTHROPIC_API_KEY comes only from the environment (a GitHub Actions secret).
+Secrets: tokens come only from the environment (GitHub's automatic token for GitHub
+Models, or an ANTHROPIC_API_KEY repository secret if AI_PROVIDER=anthropic).
 Standard library only, plus pypdf for PDFs.
 """
 from __future__ import annotations
@@ -46,14 +48,20 @@ USER_AGENT = "TelanganaFarmerAlertsBot/1.0 (public-interest notice summariser)"
 
 # Only these government domains may be fetched (checked on every redirect too).
 ALLOWED_HOST_SUFFIXES = (".gov.in", ".nic.in")
+# AI provider: "github" (free GitHub Models, default) or "anthropic" (paid Claude API).
+# Endpoints are fixed constants, never taken from input, so the token can only go to these hosts.
+GITHUB_MODELS_URL = "https://models.github.ai/inference/chat/completions"
+GITHUB_DEFAULT_MODEL = "openai/gpt-4.1"
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
-DEFAULT_MODEL = "claude-sonnet-5-5"
+ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-5-5"
 
 MAX_HTML_BYTES = 3 * 1024 * 1024
 MAX_PDF_BYTES = 20 * 1024 * 1024
 MAX_PDF_PAGES = 60
-MAX_TEXT_CHARS = 60_000          # sent to the model; longer notices are marked "partial"
+# Characters of notice text sent to the model; longer notices are marked "partial".
+# GitHub Models' free tier has a smaller input limit than the paid Claude API.
+MAX_TEXT_CHARS = int(os.environ.get("MAX_TEXT_CHARS", "0")) or None
 HTTP_TIMEOUT = 30
 PDF_EXTRACT_TIMEOUT = 90         # seconds; protects against malicious/broken PDFs
 MAX_NEW_PER_RUN = int(os.environ.get("MAX_NEW_PER_RUN", "8"))
@@ -333,8 +341,9 @@ def read_notice(url: str, extra_hosts: set[str]) -> tuple[str, str, str]:
         parser.feed(decode(body, ctype))
         text = re.sub(r"\n\s*\n+", "\n", "".join(parser.parts)).strip()
         status = "full" if text else "scanned"
-    if len(text) > MAX_TEXT_CHARS:
-        text, status = text[:MAX_TEXT_CHARS], ("partial" if status == "full" else status)
+    cap = text_cap()
+    if len(text) > cap:
+        text, status = text[:cap], ("partial" if status == "full" else status)
     return text, status, final_url
 
 
@@ -363,29 +372,53 @@ Reply with ONE JSON object and nothing else:
  "pointsEn": ["the same points in English"]}""" % (json.dumps(TOPICS), json.dumps(STATES[:7]))
 
 
-def call_claude(document_text: str, link_text: str, url: str, api_key: str) -> str:
-    payload = {
-        "model": os.environ.get("CLAUDE_MODEL", DEFAULT_MODEL),
-        "max_tokens": 2000,
-        "system": SYSTEM_PROMPT,
-        "messages": [{
-            "role": "user",
-            "content": (
-                f"Notice link text: {link_text}\nNotice URL: {url}\n\n"
-                f"<document>\n{document_text}\n</document>"
-            ),
-        }],
-    }
+def provider() -> str:
+    p = os.environ.get("AI_PROVIDER", "github").strip().lower()
+    return p if p in ("github", "anthropic") else "github"
+
+
+def text_cap() -> int:
+    if MAX_TEXT_CHARS:
+        return MAX_TEXT_CHARS
+    return 16_000 if provider() == "github" else 60_000
+
+
+def _user_message(document_text: str, link_text: str, url: str) -> str:
+    return (f"Notice link text: {link_text}\nNotice URL: {url}\n\n"
+            f"<document>\n{document_text}\n</document>")
+
+
+def _post_json(url: str, payload: dict, headers: dict) -> dict:
     req = urllib.request.Request(
-        ANTHROPIC_URL,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"x-api-key": api_key, "anthropic-version": ANTHROPIC_VERSION,
-                 "content-type": "application/json", "User-Agent": USER_AGENT},
-        method="POST",
-    )
+        url, data=json.dumps(payload).encode("utf-8"),
+        headers={**headers, "content-type": "application/json", "User-Agent": USER_AGENT}, method="POST")
     with urllib.request.urlopen(req, timeout=120) as resp:   # fixed https endpoint, TLS verified
-        data = json.loads(resp.read(2 * 1024 * 1024).decode("utf-8"))
-    return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text")
+        return json.loads(resp.read(2 * 1024 * 1024).decode("utf-8"))
+
+
+def call_ai(document_text: str, link_text: str, url: str, token: str) -> str:
+    """Return the model's raw text answer. Output is validated by parse_summary()."""
+    user = _user_message(document_text, link_text, url)
+    if provider() == "anthropic":
+        data = _post_json(ANTHROPIC_URL, {
+            "model": os.environ.get("AI_MODEL", ANTHROPIC_DEFAULT_MODEL),
+            "max_tokens": 2000, "system": SYSTEM_PROMPT,
+            "messages": [{"role": "user", "content": user}],
+        }, {"x-api-key": token, "anthropic-version": ANTHROPIC_VERSION})
+        return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text")
+    data = _post_json(GITHUB_MODELS_URL, {
+        "model": os.environ.get("AI_MODEL", GITHUB_DEFAULT_MODEL),
+        "max_tokens": 2000, "temperature": 0.1,
+        "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}],
+    }, {"Authorization": f"Bearer {token}", "Accept": "application/json"})
+    choices = data.get("choices") or [{}]
+    return ((choices[0].get("message") or {}).get("content")) or ""
+
+
+def ai_token() -> str:
+    if provider() == "anthropic":
+        return os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    return os.environ.get("MODELS_TOKEN", "").strip()
 
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -456,10 +489,12 @@ def maintain(alerts: list[dict], archive: list[dict], today: dt.date) -> tuple[l
 # --------------------------------------------------------------------------- main
 def run() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    api_key = ai_token()
     if not api_key:
-        log.error("ANTHROPIC_API_KEY is not set. Add it as a GitHub Actions secret. Stopping.")
+        need = "ANTHROPIC_API_KEY secret" if provider() == "anthropic" else "MODELS_TOKEN (the workflow passes GitHub's token)"
+        log.error("No AI token found: %s is not set. Stopping.", need)
         return 1  # fail securely: no silent fallback
+    log.info("AI provider: %s", provider())
 
     sources = load_json(SOURCES_FILE, None)
     if not isinstance(sources, list):
@@ -502,7 +537,7 @@ def run() -> int:
                     log.info("Unreadable (scanned?) notice skipped for review: %s", url)
                     rec.update(done=True, result="needs-review")  # scanned/unreadable: not summarised
                     continue
-                summary = parse_summary(call_claude(text, label, final_url, api_key))
+                summary = parse_summary(call_ai(text, label, final_url, api_key))
             except urllib.error.HTTPError as exc:
                 log.warning("HTTP %s while processing %s", exc.code, url)
                 continue
