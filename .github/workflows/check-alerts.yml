@@ -110,7 +110,7 @@ jobs:
           cp data/alerts.json _site/data/
           if [ -f data/archive.json ]; then cp data/archive.json _site/data/; fi
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
       - id: deployment
