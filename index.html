@@ -1,213 +1,684 @@
-from pathlib import Path
-
-html = r'''<!doctype html>
-<html lang="en">
+<!doctype html>
+<html lang="te">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#176b45">
-<meta name="description" content="Concise official Telangana and Central Government farmer announcements in Telugu and English.">
-<title>Telangana Farmer Alerts</title>
+<meta name="theme-color" content="#1F4D2B">
+<meta name="description" content="Telangana and Central Government farmer announcements in simple Telugu and English, checked against the official notice.">
+<title>రైతు సమాచారం · Telangana Farmer Alerts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600;700&family=Ramabhadra&display=swap" rel="stylesheet">
 <style>
-:root{--green:#176b45;--green2:#0e4d31;--pale:#eaf5ec;--paper:#f6f8f5;--ink:#1b3025;--muted:#617168;--line:#dce6de;--white:#fff;--gold:#f5c95e}
+:root{
+  --leaf:#1F4D2B; --leaf-2:#2F6B3C; --leaf-soft:#E3EFDC;
+  --gold:#F2B705; --gold-soft:#FFF4CF;
+  --blue:#2E6FB7; --blue-soft:#E2EDF8;
+  --sky:#DCEEF7; --page:#F4F8EE; --ink:#18261C; --muted:#56665A; --line:#D5E2CF; --white:#fff;
+  --amber:#8A5A00; --amber-soft:#FFEFC7; --grey-soft:#ECEFEA;
+  --display:"Ramabhadra","Noto Sans Telugu",system-ui,sans-serif;
+  --body:"Noto Sans Telugu","Noto Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-a{color:var(--green);font-weight:700;text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1000px;margin:auto;padding:0 18px}
-.hero{background:linear-gradient(125deg,var(--green2),#248653);color:white;padding:28px 0 30px}
-.brand{display:flex;align-items:center;gap:14px}.mark{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:#ffffff1b;border:1px solid #ffffff45;font-size:29px}
-h1{font-size:clamp(26px,4vw,38px);line-height:1.15;margin:0}.subtitle{margin:5px 0 0;color:#e1f2e5}
-.hero-note{font-size:13px;margin:18px 0 0;color:#eff9f0}
-main{padding:22px 0 46px}
-.notice{border:1px solid #e9d8a1;background:#fff9e8;color:#68531e;padding:13px 15px;border-radius:13px;font-size:13px;margin-bottom:18px}
-.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
-.metric{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.metric strong{display:block;color:var(--green);font-size:22px}.metric span{font-size:12px;color:var(--muted)}
-.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0 12px}
-input,select,textarea{font:inherit;color:var(--ink);background:white;border:1px solid #cbd9ce;border-radius:10px;padding:11px 12px;width:100%}
-.search{flex:1;min-width:220px;width:auto}
-.btn{border:0;border-radius:10px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer}
-.btn-primary{background:var(--green);color:white}.btn-light{background:var(--pale);color:var(--green2);border:1px solid #d4e7d7}
-.filters{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 23px}
-.filter{border:1px solid var(--line);border-radius:999px;background:white;color:var(--muted);padding:7px 12px;font-size:13px;cursor:pointer}
-.filter.active{background:var(--green);border-color:var(--green);color:white}
-.heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:25px 0 12px}
-h2{font-size:21px;margin:0}.muted{color:var(--muted);font-size:12px}
-.alerts{display:grid;grid-template-columns:1fr;gap:13px}
-.alert{background:white;border:1px solid var(--line);border-radius:16px;padding:18px}
-.alert-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
-.alert h3{font-size:19px;line-height:1.35;margin:9px 0 4px}
-.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{display:inline-block;padding:4px 9px;border-radius:999px;background:var(--pale);color:var(--green2);font-size:11px;font-weight:800}
-.badge.proposal{background:#fff1d2;color:#785500}.badge.open{background:#e8edff;color:#344a9a}
-.meta{font-size:12px;color:var(--muted);margin:7px 0 14px}
-.lang-title{font-weight:800;font-size:14px;margin:12px 0 4px}
-.points{margin:0;padding-left:22px}.points li{margin:4px 0;font-size:14px}
-.alert-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid #edf1ed;padding-top:13px;margin-top:15px}
-.empty{border:1px dashed #bfd0c1;border-radius:16px;text-align:center;padding:30px 18px;background:#fff}
-.empty-icon{font-size:34px}.empty h3{margin:8px 0 5px}.empty p{max-width:570px;margin:0 auto 14px;color:var(--muted);font-size:14px}
-.sources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-.source{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px}
-.source h3{font-size:14px;margin:0 0 5px}.source p{font-size:12px;color:var(--muted);margin:0 0 10px}
-footer{border-top:1px solid var(--line);padding-top:15px;margin-top:28px;color:var(--muted);font-size:12px}
-dialog{border:0;border-radius:17px;padding:0;width:min(650px,calc(100% - 24px));max-height:90vh;box-shadow:0 22px 80px #13291b55}
-dialog::backdrop{background:#10271bc0}
-.form-inner{padding:21px;overflow:auto;max-height:90vh}.form-inner h2{margin-bottom:3px}.form-intro{font-size:13px;color:var(--muted);margin:0 0 14px}
-.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:750;margin-bottom:5px}
-.field small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-@media(max-width:680px){.sources{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.heading{align-items:flex-start;flex-direction:column}.form-row{grid-template-columns:1fr}}
-@media(max-width:420px){.metrics{grid-template-columns:1fr}.brand{align-items:flex-start}.mark{width:47px;height:47px;flex:0 0 47px}}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--page);color:var(--ink);font:17px/1.65 var(--body)}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.en{display:block;font-size:.82em;color:var(--muted);font-weight:400}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--sky) 0%,#EEF6F2 55%,var(--page) 100%);min-height:620px}
+.hero-scene{position:absolute;inset:auto 0 0 0;width:100%;height:330px;display:block}
+.hero-text{position:relative;z-index:1;padding:34px 0 0;max-width:640px}
+.unofficial{display:inline-block;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:13px;color:var(--muted)}
+.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,8vw,78px);line-height:1.05;margin:14px 0 2px;color:var(--leaf)}
+.hero .h1-en{font-size:clamp(19px,2.6vw,24px);font-weight:700;color:var(--leaf-2);margin:0}
+.hero .lede{font-size:18px;margin:12px 0 0;max-width:520px}
+.hero .lede .en{font-size:15px;margin-top:2px}
+
+/* ---------- Sections ---------- */
+main{padding-bottom:30px}
+section{margin:44px 0}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,4vw,32px);line-height:1.2;margin:0 0 4px;color:var(--leaf)}
+h2 .en{font-family:var(--body);font-size:16px;font-weight:600}
+.section-intro{color:var(--muted);margin:0 0 18px;font-size:15px}
+
+/* How to use: a real 3-step sequence */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:var(--white);border:1px solid var(--line);border-radius:22px;overflow:hidden;margin-top:-28px;position:relative;z-index:2;box-shadow:0 10px 30px -18px #1F4D2B66}
+.step{padding:20px 22px;display:flex;gap:14px;align-items:flex-start}
+.step+.step{border-left:1px solid var(--line)}
+.step-num{flex:0 0 42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--ink);font-family:var(--display);font-size:22px}
+.step p{margin:0;font-weight:600;line-height:1.45}
+.step .en{font-weight:400;font-size:14px;margin-top:3px}
+
+/* Topic tiles */
+.search-box{position:relative;margin:0 0 16px}
+.search-box input{width:100%;font:inherit;font-size:18px;padding:15px 18px 15px 52px;border:2px solid var(--line);border-radius:16px;background:var(--white);color:var(--ink)}
+.search-box input:focus{border-color:var(--leaf-2);outline:none;box-shadow:0 0 0 4px #2F6B3C22}
+.search-box svg{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:22px;height:22px;color:var(--muted)}
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.topic{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:14px 16px;text-align:left;font:inherit;cursor:pointer;background:var(--white);color:var(--ink);border:2px solid var(--line);border-radius:16px;transition:border-color .15s,background .15s}
+.topic .ico{font-size:26px;line-height:1.2}
+.topic .te{font-weight:700;font-size:16px;line-height:1.3}
+.topic .en{font-size:13px}
+.topic:hover{border-color:var(--leaf-2)}
+.topic[aria-pressed="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--white)}
+.topic[aria-pressed="true"] .en{color:#CFE3C8}
+
+/* Alerts */
+.list-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.count{font-size:14px;color:var(--muted)}
+.alerts{display:grid;gap:18px;margin-top:16px}
+.alert{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:22px 24px;border-top:6px solid var(--leaf-2)}
+.alert.is-proposal{border-top-color:var(--gold)}
+.alert.is-open{border-top-color:var(--blue)}
+.alert.is-closed{border-top-color:#AEB8AA;opacity:.85}
+.tags{display:flex;gap:8px;flex-wrap:wrap}
+.tag{display:inline-block;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700;background:var(--leaf-soft);color:var(--leaf)}
+.tag.proposal{background:var(--amber-soft);color:var(--amber)}
+.tag.open{background:var(--blue-soft);color:#1F4F87}
+.tag.closed{background:var(--grey-soft);color:#4E5A4F}
+.tag.plain{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:600}
+.alert h3{font-family:var(--display);font-weight:400;font-size:clamp(23px,3.4vw,28px);line-height:1.3;margin:12px 0 2px}
+.alert .title-en{font-weight:600;color:var(--muted);margin:0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0 4px}
+.fact{background:var(--page);border-radius:14px;padding:10px 14px}
+.fact .k{font-size:13px;color:var(--muted);display:block}
+.fact .v{font-weight:700;font-size:15px}
+.fact.warn{background:var(--amber-soft)}
+.fact.warn .v{color:var(--amber)}
+.points-wrap{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:14px}
+.points-wrap h4{margin:0 0 6px;font-size:15px;color:var(--leaf-2)}
+.points{margin:0;padding-left:20px}
+.points li{margin:6px 0}
+.points-en li{font-size:15px;color:#2E3D31}
+.alert-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.open-notice{display:inline-flex;align-items:center;gap:8px;background:var(--leaf);color:var(--white);text-decoration:none;font-weight:700;padding:12px 18px;border-radius:14px}
+.open-notice:hover{background:var(--leaf-2)}
+.open-notice .en{color:#CFE3C8;display:inline;font-size:14px}
+.remove{font:inherit;font-size:14px;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:6px}
+
+.empty{display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;background:var(--white);border:2px dashed var(--line);border-radius:22px;padding:24px;margin-top:16px}
+.empty svg{width:150px;height:auto}
+.empty h3{font-family:var(--display);font-weight:400;font-size:24px;margin:0;color:var(--leaf)}
+.empty p{margin:6px 0 0;color:var(--muted);font-size:15px}
+
+/* Sources */
+.sources{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.source{display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-decoration:none;color:var(--ink)}
+.source:hover{border-color:var(--blue)}
+.source strong{font-size:15px}
+.source span{font-size:13px;color:var(--muted)}
+.source em{font-style:normal;font-size:13px;color:var(--blue);margin-top:6px;font-weight:600}
+
+/* State symbols */
+.symbols{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.symbol{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:16px 12px;text-align:center}
+.symbol svg{width:86px;height:86px;display:block;margin:0 auto 6px}
+.symbol .te{font-family:var(--display);font-size:20px;color:var(--leaf);display:block;line-height:1.25}
+.symbol .en{font-size:13px}
+
+/* Volunteer tools */
+.tools{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:6px 22px}
+.tools summary{cursor:pointer;font-weight:700;padding:14px 0;list-style-position:outside}
+.tools summary .en{display:inline;margin-left:6px}
+.tools-body{padding:0 0 18px}
+.policy{background:var(--gold-soft);border-radius:14px;padding:12px 16px;font-size:14px;margin:0 0 14px}
+.policy ul{margin:6px 0 0;padding-left:20px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;font-size:15px;border-radius:12px;padding:11px 16px;cursor:pointer;border:2px solid var(--leaf);background:var(--leaf);color:var(--white)}
+.btn.ghost{background:var(--white);color:var(--leaf)}
+.btn:hover{filter:brightness(1.08)}
+
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:14px}
+footer p{margin:6px 0;max-width:760px}
+
+/* Dialog */
+dialog{border:0;border-radius:22px;padding:0;width:min(680px,calc(100% - 24px));max-height:92vh;box-shadow:0 30px 80px #13291b66}
+dialog::backdrop{background:#10271bb3}
+.form-inner{padding:24px;overflow:auto;max-height:92vh}
+.form-inner h2{margin-bottom:2px}
+.form-intro{font-size:14px;color:var(--muted);margin:0 0 10px}
+.field{margin:14px 0}
+.field label{display:block;font-size:14px;font-weight:700;margin-bottom:5px}
+.field small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.field input,.field select,.field textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--white);border:2px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--leaf-2);outline:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+
+@media (max-width:760px){
+  .steps{grid-template-columns:1fr;margin-top:-20px}
+  .step+.step{border-left:0;border-top:1px solid var(--line)}
+  .points-wrap{grid-template-columns:1fr}
+  .alert{padding:18px 16px}
+  .symbols{grid-template-columns:repeat(2,1fr)}
+  .row2{grid-template-columns:1fr}
+  .empty{grid-template-columns:1fr;text-align:center}
+  .empty svg{margin:0 auto}
+  .hero{min-height:610px}
+  .hero-scene{height:240px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bird-wing{animation:none!important}}
+.bird-wing{transform-origin:62px 40px;animation:flap 3.6s ease-in-out infinite}
+@keyframes flap{0%,88%,100%{transform:rotate(0)}92%{transform:rotate(-14deg)}96%{transform:rotate(4deg)}}
 </style>
 </head>
 <body>
+
 <header class="hero">
-  <div class="wrap">
-    <div class="brand">
-      <div class="mark" aria-hidden="true">🌾</div>
-      <div><h1>Telangana Farmer Alerts</h1><p class="subtitle">తెలంగాణ రైతు సమాచారం</p></div>
-    </div>
-    <p class="hero-note">Important government updates for farmers — Telugu first, English next.</p>
-  </div>
+  <div class="wrap"><div class="hero-text">
+    <span class="unofficial">ప్రభుత్వ వెబ్‌సైట్ కాదు · Not an official government website</span>
+    <h1>రైతు సమాచారం</h1>
+    <p class="h1-en">Telangana Farmer Alerts</p>
+    <p class="lede">ప్రభుత్వ ప్రకటనలు సరళమైన తెలుగులో — ప్రతి సమాచారం అధికారిక ఉత్తర్వుతో సరిచూసినదే.
+      <span class="en">Government announcements for farmers in simple Telugu and English, each checked against the official notice.</span></p>
+  </div></div>
+
+  <!-- Original illustration: Telangana fields, canal, school, farmer with child, Jammi tree, Palapitta, Tangedu -->
+  <svg class="hero-scene" viewBox="0 0 1200 330" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFE38A"/><stop offset="1" stop-color="#FFE38A" stop-opacity="0"/></radialGradient>
+    </defs>
+    <circle cx="930" cy="80" r="120" fill="url(#sunGlow)"/>
+    <circle cx="930" cy="80" r="44" fill="#F7C531"/>
+    <!-- distant hills -->
+    <path d="M0 170 C150 120 260 150 380 128 C520 104 610 150 760 122 C900 98 1030 140 1200 112 L1200 330 L0 330Z" fill="#B9D59C"/>
+    <!-- school (education) -->
+    <g transform="translate(694 104)">
+      <rect x="0" y="22" width="78" height="38" fill="#F6EFE2"/>
+      <path d="M-6 24 L39 0 L84 24Z" fill="#B5532E"/>
+      <rect x="31" y="36" width="16" height="24" fill="#7A4A2A"/>
+      <rect x="8" y="32" width="14" height="11" fill="#9CC3E2"/><rect x="56" y="32" width="14" height="11" fill="#9CC3E2"/>
+      <line x1="39" y1="0" x2="39" y2="-22" stroke="#5B4A3A" stroke-width="2"/>
+      <rect x="39" y="-22" width="18" height="4" fill="#FF9933"/><rect x="39" y="-18" width="18" height="4" fill="#fff"/><rect x="39" y="-14" width="18" height="4" fill="#138808"/>
+    </g>
+    <!-- mid fields -->
+    <path d="M0 205 C200 175 380 196 560 182 C760 166 940 196 1200 172 L1200 330 L0 330Z" fill="#8DBB5E"/>
+    <path d="M430 206 C560 186 700 175 860 192 C960 200 1080 180 1200 176 L1200 214 C900 228 700 214 560 220 C500 222 460 215 430 206Z" fill="#E9C84A"/>
+    <!-- canal (development) -->
+    <path d="M0 246 C180 226 330 238 470 230 C640 220 820 246 1200 226 L1200 246 C820 266 640 242 470 252 C330 260 180 248 0 268Z" fill="#7FB8E0"/>
+    <path d="M60 252 C200 238 330 248 450 242" stroke="#BFE0F3" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- near field with crop rows -->
+    <path d="M0 268 C200 250 420 262 620 254 C820 246 1000 266 1200 252 L1200 330 L0 330Z" fill="#4E8A3E"/>
+    <g stroke="#3D7432" stroke-width="3" stroke-linecap="round">
+      <path d="M40 300 L120 278"/><path d="M110 312 L210 282"/><path d="M200 322 L310 284"/><path d="M640 320 L720 282"/><path d="M730 322 L800 280"/>
+    </g>
+    <!-- farmer with towel on head, carrying a hoe, walking with child carrying school bag -->
+    <g transform="translate(800 196)">
+      <path d="M0 34 L-10 4" stroke="#6B4A2E" stroke-width="4" stroke-linecap="round"/>
+      <path d="M-14 0 L-4 6 L-12 10Z" fill="#6B4A2E"/>
+      <circle cx="10" cy="8" r="9" fill="#8A5A3C"/>
+      <path d="M1 4 C4 -4 18 -4 20 4 C14 2 8 2 1 4Z" fill="#FFFFFF"/>
+      <path d="M2 18 L18 18 L20 54 L0 54Z" fill="#FFFFFF"/>
+      <path d="M2 54 L6 82 M18 54 L16 82" stroke="#E9E2D3" stroke-width="7" stroke-linecap="round"/>
+      <path d="M2 22 L-6 36" stroke="#8A5A3C" stroke-width="5" stroke-linecap="round"/>
+      <path d="M18 22 L28 40" stroke="#8A5A3C" stroke-width="5" stroke-linecap="round"/>
+      <!-- child -->
+      <g transform="translate(36 30)">
+        <circle cx="8" cy="6" r="6.5" fill="#8A5A3C"/>
+        <path d="M2 13 L14 13 L15 36 L1 36Z" fill="#2E6FB7"/>
+        <rect x="-5" y="15" width="8" height="14" rx="2" fill="#F2B705"/>
+        <path d="M3 36 L4 52 M13 36 L12 52" stroke="#3B2A1E" stroke-width="5" stroke-linecap="round"/>
+        <path d="M2 18 L-8 28" stroke="#8A5A3C" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <path d="M28 40 L36 50" stroke="#8A5A3C" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <!-- Jammi tree with Palapitta -->
+    <g transform="translate(1010 108)">
+      <path d="M40 210 C38 160 44 120 36 80 C50 112 52 150 56 210Z" fill="#6E4B30"/>
+      <path d="M40 120 C20 100 0 96 -24 98" stroke="#6E4B30" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M44 100 C66 84 92 82 118 88" stroke="#6E4B30" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <g fill="#3F7A3A">
+        <ellipse cx="38" cy="60" rx="70" ry="40"/><ellipse cx="-10" cy="88" rx="44" ry="24"/><ellipse cx="100" cy="76" rx="48" ry="26"/>
+      </g>
+      <g fill="#5E9C4C">
+        <ellipse cx="20" cy="46" rx="34" ry="18"/><ellipse cx="72" cy="56" rx="30" ry="16"/><ellipse cx="-20" cy="80" rx="20" ry="11"/>
+      </g>
+      <!-- Palapitta (Indian Roller) perched on branch -->
+      <g transform="translate(-58 62)">
+        <path d="M30 40 C30 26 44 20 56 24 C68 28 72 40 64 50 C56 58 38 56 30 40Z" fill="#9C6B4A"/>
+        <circle cx="64" cy="26" r="11" fill="#5F8F7A"/>
+        <path d="M74 26 L84 29 L74 31Z" fill="#2C2C2C"/>
+        <circle cx="67" cy="24" r="2" fill="#111"/>
+        <g class="bird-wing"><path d="M36 34 C46 24 62 30 64 40 C54 50 40 50 36 34Z" fill="#2E6FB7"/><path d="M40 40 C48 36 58 38 62 42 C54 48 46 48 40 40Z" fill="#36A3C9"/></g>
+        <path d="M30 42 L8 52 L12 46 L6 44Z" fill="#2E6FB7"/>
+        <path d="M46 54 L44 60 M54 54 L54 60" stroke="#3B2A1E" stroke-width="2"/>
+      </g>
+    </g>
+    <!-- Tangedu flowers in the foreground -->
+    <g>
+      <path d="M70 330 C74 300 80 284 92 270" stroke="#3D7432" stroke-width="3" fill="none"/>
+      <path d="M120 330 C118 304 126 290 140 278" stroke="#3D7432" stroke-width="3" fill="none"/>
+      <g fill="#F2B705">
+        <circle cx="92" cy="266" r="9"/><circle cx="104" cy="276" r="8"/><circle cx="82" cy="278" r="7"/>
+        <circle cx="140" cy="274" r="9"/><circle cx="152" cy="284" r="7"/><circle cx="130" cy="286" r="7"/>
+        <circle cx="1150" cy="300" r="9"/><circle cx="1162" cy="312" r="7"/><circle cx="1138" cy="310" r="7"/>
+      </g>
+      <g fill="#E39A00"><circle cx="92" cy="266" r="3"/><circle cx="140" cy="274" r="3"/><circle cx="1150" cy="300" r="3"/></g>
+    </g>
+  </svg>
 </header>
+
 <main class="wrap">
-  <div class="notice"><strong>Verification policy / ధృవీకరణ:</strong> Only add an alert after checking the original official notification. A proposal is not an approved benefit. This page does not automatically monitor government websites; scheduled monitoring needs a separate GitHub Actions workflow.</div>
 
-  <section class="metrics" aria-label="Website summary">
-    <div class="metric"><strong id="count">0</strong><span>Alerts shown / సమాచారం</span></div>
-    <div class="metric"><strong>తెలుగు + EN</strong><span>Bilingual bullet points / రెండు భాషలు</span></div>
-    <div class="metric"><strong>Official links</strong><span>Direct source URLs / అధికారిక లింకులు</span></div>
-  </section>
-
-  <div class="toolbar">
-    <input class="search" id="search" type="search" placeholder="Search alerts / సమాచారం వెతకండి" aria-label="Search alerts">
-    <button class="btn btn-primary" id="add" type="button">＋ Add verified alert</button>
-    <button class="btn btn-light" id="export" type="button">Export backup</button>
-    <button class="btn btn-light" id="import" type="button">Import backup</button>
-    <input id="file" type="file" accept="application/json,.json" hidden>
+  <!-- 1. How to use (a real sequence) -->
+  <div class="steps" role="list" aria-label="How to use this website">
+    <div class="step" role="listitem"><span class="step-num" aria-hidden="true">1</span>
+      <p>మీకు కావాల్సిన విషయం ఎంచుకోండి<span class="en">Pick the topic you need</span></p></div>
+    <div class="step" role="listitem"><span class="step-num" aria-hidden="true">2</span>
+      <p>తెలుగులో ముఖ్యాంశాలు చదవండి<span class="en">Read the key points in Telugu</span></p></div>
+    <div class="step" role="listitem"><span class="step-num" aria-hidden="true">3</span>
+      <p>అధికారిక ప్రకటన తెరిచి సరిచూసుకోండి<span class="en">Open the official notice to confirm</span></p></div>
   </div>
-  <nav class="filters" id="filters" aria-label="Filter alerts">
-    <button class="filter active" data-cat="All">All / అన్నీ</button>
-    <button class="filter" data-cat="Loans">Loans / రుణాలు</button>
-    <button class="filter" data-cat="Payments">Payments / చెల్లింపులు</button>
-    <button class="filter" data-cat="Subsidies">Subsidies / సబ్సిడీలు</button>
-    <button class="filter" data-cat="Land">Land records / భూ రికార్డులు</button>
-    <button class="filter" data-cat="Crops & MSP">Crops & MSP / పంటలు</button>
-    <button class="filter" data-cat="Insurance">Insurance / బీమా</button>
-    <button class="filter" data-cat="Central schemes">Central schemes / కేంద్ర పథకాలు</button>
-    <button class="filter" data-cat="Other">Other / ఇతరాలు</button>
-  </nav>
 
-  <div class="heading"><h2>Latest verified updates / తాజా ధృవీకరించిన సమాచారం</h2><span class="muted" id="status">No alerts added yet</span></div>
-  <section id="alerts" class="alerts" aria-live="polite"></section>
-  <section id="empty" class="empty">
-    <div class="empty-icon">🌱</div>
-    <h3>No new verified alerts</h3>
-    <p>ప్రస్తుతం ఈ వెబ్‌సైట్‌లో కొత్తగా ధృవీకరించిన సమాచారం లేదు. అధికారిక ఉత్తర్వు లేదా ప్రకటనను నిర్ధారించిన తర్వాత మాత్రమే చేర్చండి.<br>There are no verified alerts in this browser yet. Add only after checking the official notification.</p>
-    <button class="btn btn-primary" id="addFirst" type="button">Add first alert / మొదటి సమాచారం చేర్చండి</button>
+  <!-- 2. Topics + search -->
+  <section aria-labelledby="topicsTitle">
+    <h2 id="topicsTitle">విషయం ఎంచుకోండి <span class="en">Choose a topic</span></h2>
+    <p class="section-intro">ఒక బొమ్మను నొక్కండి, లేదా పథకం పేరుతో వెతకండి. · Tap a picture, or search by scheme name.</p>
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="search" type="search" placeholder="వెతకండి — ఉదా: రైతు భరోసా · Search, e.g. Rythu Bharosa" aria-label="Search alerts">
+    </div>
+    <div class="topics" id="topics"></div>
   </section>
 
-  <div class="heading"><h2>Official sources / అధికారిక వనరులు</h2><span class="muted">Verify original notices here</span></div>
-  <section class="sources">
-    <article class="source"><h3>Telangana GO Register</h3><p>Government Orders and proceedings</p><a href="https://goir.telangana.gov.in/" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>Agriculture Department</h3><p>Farmer schemes, advisories and inputs</p><a href="https://agri.telangana.gov.in/" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>Rythu Bharosa GOs & Circulars</h3><p>Rythu Bharosa official documents</p><a href="https://www.rythubharosa.telangana.gov.in/gos_circulars.aspx" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>Telangana State Portal News</h3><p>Government press releases</p><a href="https://www.telangana.gov.in/news/" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>Telangana I&PR</h3><p>Official public information releases</p><a href="https://ipr.telangana.gov.in/" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>Central Government — PIB</h3><p>Union Government releases and schemes</p><a href="https://pib.gov.in/" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>PM-KISAN</h3><p>Central farmer income support scheme</p><a href="https://pmkisan.gov.in/" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>PM Fasal Bima Yojana</h3><p>Crop insurance scheme information</p><a href="https://pmfby.gov.in/" target="_blank" rel="noopener">Open official site ↗</a></article>
-    <article class="source"><h3>Ministry of Agriculture</h3><p>Central agriculture schemes and guidelines</p><a href="https://agriwelfare.gov.in/" target="_blank" rel="noopener">Open official site ↗</a></article>
+  <!-- 3. Alerts -->
+  <section aria-labelledby="alertsTitle">
+    <div class="list-head">
+      <h2 id="alertsTitle">తాజా సమాచారం <span class="en">Latest updates</span></h2>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div id="alerts" class="alerts"></div>
+    <div id="empty" class="empty" hidden>
+      <svg viewBox="0 0 150 120" aria-hidden="true">
+        <path d="M10 104 C50 92 100 92 140 104 L140 120 L10 120Z" fill="#8DBB5E"/>
+        <path d="M75 100 C74 80 76 62 75 44" stroke="#3D7432" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M75 70 C60 62 52 50 54 38 C66 42 74 54 75 70Z" fill="#5E9C4C"/>
+        <path d="M75 58 C90 50 98 38 96 26 C84 30 76 42 75 58Z" fill="#4E8A3E"/>
+        <circle cx="118" cy="30" r="14" fill="#F7C531"/>
+      </svg>
+      <div>
+        <h3 id="emptyTitle">ఇంకా సమాచారం లేదు</h3>
+        <p id="emptyText">అధికారిక ప్రకటన సరిచూసిన తర్వాతే ఇక్కడ సమాచారం చేర్చబడుతుంది. త్వరలో మళ్లీ చూడండి.<br>
+          No updates yet. An update is added here only after it has been checked against the official notice.</p>
+      </div>
+    </div>
   </section>
-  <footer>
-    <strong>Privacy & storage:</strong> Alerts are saved only in this browser using local storage. Use “Export backup” before changing devices or clearing browser data. For a shared live alert feed, connect a scheduled workflow and store the verified alert data in the GitHub repository.<br>
-    <span>Proposals, approved orders, application windows and payment announcements must be labelled separately. Never infer eligibility or deadlines that are not stated in the official source.</span>
-  </footer>
+
+  <!-- 4. Official sources -->
+  <section aria-labelledby="sourcesTitle">
+    <h2 id="sourcesTitle">అధికారిక వెబ్‌సైట్లు <span class="en">Official websites</span></h2>
+    <p class="section-intro">సందేహం ఉంటే, ఇక్కడ నేరుగా సరిచూసుకోండి. · If in doubt, check directly here.</p>
+    <div class="sources">
+      <a class="source" href="https://goir.telangana.gov.in/" target="_blank" rel="noopener noreferrer"><strong>Telangana GO Register</strong><span>ప్రభుత్వ ఉత్తర్వులు · Government Orders</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://agri.telangana.gov.in/" target="_blank" rel="noopener noreferrer"><strong>Agriculture Department</strong><span>వ్యవసాయ శాఖ · Schemes and advisories</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://www.rythubharosa.telangana.gov.in/gos_circulars.aspx" target="_blank" rel="noopener noreferrer"><strong>Rythu Bharosa</strong><span>ఉత్తర్వులు, సర్క్యులర్లు · GOs and circulars</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://www.telangana.gov.in/news/" target="_blank" rel="noopener noreferrer"><strong>Telangana State Portal</strong><span>ప్రభుత్వ వార్తలు · Press releases</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://ipr.telangana.gov.in/" target="_blank" rel="noopener noreferrer"><strong>Telangana I&amp;PR</strong><span>సమాచార శాఖ · Public information</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://pib.gov.in/" target="_blank" rel="noopener noreferrer"><strong>PIB (Central Government)</strong><span>కేంద్ర ప్రభుత్వ ప్రకటనలు · Union releases</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://pmkisan.gov.in/" target="_blank" rel="noopener noreferrer"><strong>PM-KISAN</strong><span>పీఎం కిసాన్ · Income support</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://pmfby.gov.in/" target="_blank" rel="noopener noreferrer"><strong>PM Fasal Bima Yojana</strong><span>పంట బీమా · Crop insurance</span><em>తెరవండి · Open site</em></a>
+      <a class="source" href="https://agriwelfare.gov.in/" target="_blank" rel="noopener noreferrer"><strong>Ministry of Agriculture</strong><span>కేంద్ర వ్యవసాయ శాఖ · Central schemes</span><em>తెరవండి · Open site</em></a>
+    </div>
+  </section>
+
+  <!-- 5. State symbols -->
+  <section aria-labelledby="symbolsTitle">
+    <h2 id="symbolsTitle">మన రాష్ట్ర చిహ్నాలు <span class="en">Our state symbols</span></h2>
+    <p class="section-intro">తెలంగాణ నాలుగు రాష్ట్ర చిహ్నాలు · The four state symbols of Telangana</p>
+    <div class="symbols">
+      <figure class="symbol" style="margin:0">
+        <svg viewBox="0 0 86 86" aria-hidden="true"><circle cx="43" cy="43" r="42" fill="#E2EDF8"/>
+          <path d="M20 50 C20 36 34 30 46 34 C58 38 62 50 54 60 C46 68 28 66 20 50Z" fill="#9C6B4A"/>
+          <circle cx="56" cy="34" r="10" fill="#5F8F7A"/><path d="M65 34 L74 37 L65 39Z" fill="#2C2C2C"/><circle cx="59" cy="32" r="2" fill="#111"/>
+          <path d="M26 44 C36 34 52 40 54 50 C44 60 30 60 26 44Z" fill="#2E6FB7"/><path d="M30 50 C38 46 48 48 52 52 C44 58 36 58 30 50Z" fill="#36A3C9"/>
+          <path d="M20 52 L4 62 L8 56 L2 54Z" fill="#2E6FB7"/><path d="M14 70 L72 70" stroke="#6E4B30" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <figcaption><span class="te">పాలపిట్ట</span><span class="en">State bird · Indian Roller</span></figcaption>
+      </figure>
+      <figure class="symbol" style="margin:0">
+        <svg viewBox="0 0 86 86" aria-hidden="true"><circle cx="43" cy="43" r="42" fill="#FFF4CF"/>
+          <path d="M24 46 C24 38 34 34 46 36 L58 38 C62 40 62 50 56 52 L30 54 C26 54 24 50 24 46Z" fill="#B97A43"/>
+          <g fill="#F6E7CF"><circle cx="34" cy="42" r="2"/><circle cx="42" cy="40" r="2"/><circle cx="50" cy="42" r="2"/><circle cx="38" cy="48" r="2"/><circle cx="47" cy="48" r="2"/></g>
+          <path d="M56 40 L62 26 C64 22 70 22 70 26 L68 34 C66 38 62 40 58 42Z" fill="#B97A43"/>
+          <path d="M64 24 L60 12 M64 24 L68 14 M66 13 L70 8" stroke="#6E4B30" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="67" cy="28" r="1.6" fill="#111"/>
+          <path d="M30 54 L28 70 M36 54 L36 70 M50 52 L50 70 M56 51 L58 70" stroke="#8A5A3C" stroke-width="3.4" stroke-linecap="round"/>
+        </svg>
+        <figcaption><span class="te">జింక</span><span class="en">State animal · Spotted deer</span></figcaption>
+      </figure>
+      <figure class="symbol" style="margin:0">
+        <svg viewBox="0 0 86 86" aria-hidden="true"><circle cx="43" cy="43" r="42" fill="#E3EFDC"/>
+          <path d="M40 76 C40 60 42 48 38 38 C46 48 48 60 48 76Z" fill="#6E4B30"/>
+          <g fill="#3F7A3A"><ellipse cx="43" cy="30" rx="26" ry="15"/><ellipse cx="24" cy="40" rx="14" ry="8"/><ellipse cx="62" cy="38" rx="15" ry="9"/></g>
+          <g fill="#5E9C4C"><ellipse cx="36" cy="25" rx="12" ry="6"/><ellipse cx="54" cy="28" rx="11" ry="6"/></g>
+          <path d="M14 76 L72 76" stroke="#8DBB5E" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <figcaption><span class="te">జమ్మి చెట్టు</span><span class="en">State tree · Jammi</span></figcaption>
+      </figure>
+      <figure class="symbol" style="margin:0">
+        <svg viewBox="0 0 86 86" aria-hidden="true"><circle cx="43" cy="43" r="42" fill="#FFF4CF"/>
+          <path d="M43 78 C43 64 44 54 43 44" stroke="#3D7432" stroke-width="3" fill="none"/>
+          <path d="M43 62 C34 60 28 54 28 48 C36 50 42 54 43 62Z" fill="#5E9C4C"/>
+          <g fill="#F2B705"><ellipse cx="43" cy="22" rx="7" ry="10"/><ellipse cx="43" cy="22" rx="7" ry="10" transform="rotate(72 43 32)"/><ellipse cx="43" cy="22" rx="7" ry="10" transform="rotate(144 43 32)"/><ellipse cx="43" cy="22" rx="7" ry="10" transform="rotate(216 43 32)"/><ellipse cx="43" cy="22" rx="7" ry="10" transform="rotate(288 43 32)"/></g>
+          <circle cx="43" cy="32" r="5" fill="#E39A00"/>
+        </svg>
+        <figcaption><span class="te">తంగేడు పువ్వు</span><span class="en">State flower · Tanner's cassia</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 6. Volunteer tools (kept out of the way for first-time visitors) -->
+  <section aria-labelledby="toolsTitle">
+    <details class="tools" id="tools">
+      <summary id="toolsTitle">సమాచారం చేర్చేవారి కోసం<span class="en">For volunteers who add updates</span></summary>
+      <div class="tools-body">
+        <div class="policy">
+          <strong>చేర్చే ముందు · Before adding an update</strong>
+          <ul>
+            <li>Read the full official notice (all PDF pages, tables and annexures), not just the headline.</li>
+            <li>Write only what the notice states. If eligibility, deadline or payment date is missing, say “Not specified”.</li>
+            <li>Mark proposals and media reports clearly; a proposal is not an approved benefit.</li>
+            <li>If a PDF is scanned and the text could not be fully read, choose “Scanned — needs review”.</li>
+            <li>Never delete a closed alert; mark it “Expired” or “Superseded” so the history stays.</li>
+          </ul>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="add" type="button">కొత్త సమాచారం చేర్చండి · Add an update</button>
+          <button class="btn ghost" id="export" type="button">Save backup file</button>
+          <button class="btn ghost" id="import" type="button">Load backup file</button>
+          <input id="file" type="file" accept="application/json,.json" hidden>
+        </div>
+        <p class="section-intro" style="margin:12px 0 0">Updates are saved only in this browser. Save a backup file before changing phones or clearing browser data.</p>
+      </div>
+    </details>
+  </section>
 </main>
 
-<dialog id="editor">
+<footer>
+  <div class="wrap">
+    <p><strong>ఇది ప్రభుత్వ వెబ్‌సైట్ కాదు.</strong> This is not an official government website. Every update links to the official notice — always confirm there before applying or paying anything.</p>
+    <p>Proposals, approved orders, application windows and payment announcements are labelled separately. Closed updates stay visible, marked as expired or superseded.</p>
+  </div>
+</footer>
+
+<dialog id="editor" aria-labelledby="formTitle">
 <form id="alertForm" class="form-inner">
-  <h2>Add a verified notification</h2>
-  <p class="form-intro">Use the exact publication date and a direct official notification URL. Add notable facts as separate bullet points.</p>
-  <div class="field"><label for="title">Notification title (English) *</label><input id="title" name="title" required maxlength="180" placeholder="Short, clear headline"></div>
-  <div class="field"><label for="titleTe">శీర్షిక (తెలుగు)</label><input id="titleTe" name="titleTe" maxlength="180" placeholder="తెలుగులో శీర్షిక"></div>
-  <div class="form-row">
+  <h2 id="formTitle">కొత్త సమాచారం <span class="en">Add a checked update</span></h2>
+  <p class="form-intro">Use the exact date and a direct link to the official notice. Write one point per line.</p>
+
+  <div class="field"><label for="titleTe">శీర్షిక (తెలుగు) *</label><input id="titleTe" name="titleTe" required maxlength="180" placeholder="తెలుగులో స్పష్టమైన శీర్షిక"></div>
+  <div class="field"><label for="title">Title (English) *</label><input id="title" name="title" required maxlength="180" placeholder="Short, clear headline"></div>
+
+  <div class="row2">
     <div class="field"><label for="date">Publication date *</label><input id="date" name="date" type="date" required></div>
-    <div class="field"><label for="department">Department / source *</label><input id="department" name="department" required maxlength="120" placeholder="Issuing department"></div>
+    <div class="field"><label for="deadline">Deadline / చివరి తేదీ</label><input id="deadline" name="deadline" type="date"><small>Leave empty if the notice does not state one.</small></div>
   </div>
-  <div class="form-row">
-    <div class="field"><label for="category">Category *</label><select id="category" name="category"><option>Loans</option><option>Payments</option><option>Subsidies</option><option>Land</option><option>Crops & MSP</option><option>Insurance</option><option>Central schemes</option><option>Other</option></select></div>
-    <div class="field"><label for="state">Notification status *</label><select id="state" name="state"><option>Approved Government Order</option><option>Approved scheme / decision</option><option>Proposal / request only</option><option>Applications open</option><option>Payments announced</option><option>Advisory / information</option><option>Procurement approved</option></select></div>
+  <div class="row2">
+    <div class="field"><label for="department">Issuing department *</label><input id="department" name="department" required maxlength="120" placeholder="e.g. Agriculture Department"></div>
+    <div class="field"><label for="checked">Last checked *</label><input id="checked" name="checked" type="date" required></div>
   </div>
-  <div class="field"><label for="pointsTe">తెలుగు ముఖ్యాంశాలు * (ప్రతి అంశం కొత్త లైన్‌లో)</label><textarea id="pointsTe" name="pointsTe" rows="4" required placeholder="అర్హులైన రైతులకు వర్తించే వివరాలు&#10;దరఖాస్తు గడువు లేదా తీసుకోవాల్సిన చర్య"></textarea><small>One bullet per line. Do not include claims that are not in the official notice.</small></div>
-  <div class="field"><label for="pointsEn">English key points * (one point per line)</label><textarea id="pointsEn" name="pointsEn" rows="4" required placeholder="Who is affected and what changed&#10;Deadline, eligibility or action required"></textarea></div>
-  <div class="field"><label for="url">Direct official notification URL *</label><input id="url" name="url" type="url" required placeholder="https://..."><small>Prefer the exact GO, circular or press release page/PDF, not a general homepage.</small></div>
-  <div class="form-actions"><button class="btn btn-light" id="cancel" type="button">Cancel</button><button class="btn btn-primary" type="submit">Save alert</button></div>
+  <div class="row2">
+    <div class="field"><label for="category">Topic *</label><select id="category" name="category"></select></div>
+    <div class="field"><label for="state">Status *</label><select id="state" name="state"></select></div>
+  </div>
+  <div class="field"><label for="fullText">Was the full notice read? *</label>
+    <select id="fullText" name="fullText">
+      <option value="full">Yes — all pages read</option>
+      <option value="partial">Partly — some pages or tables unreadable</option>
+      <option value="scanned">Scanned — needs review</option>
+    </select></div>
+
+  <div class="field"><label for="pointsTe">తెలుగు ముఖ్యాంశాలు * (ప్రతి అంశం కొత్త లైన్‌లో)</label>
+    <textarea id="pointsTe" name="pointsTe" rows="4" required placeholder="ఎవరికి వర్తిస్తుంది&#10;ప్రయోజనం&#10;ఏం చేయాలి"></textarea></div>
+  <div class="field"><label for="pointsEn">English key points * (one per line)</label>
+    <textarea id="pointsEn" name="pointsEn" rows="4" required placeholder="Eligibility&#10;Benefit&#10;Action required"></textarea>
+    <small>Write only what the official notice states.</small></div>
+  <div class="field"><label for="url">Official notice link *</label><input id="url" name="url" type="url" required placeholder="https://..."><small>The exact GO, circular, press release or PDF, not a homepage.</small></div>
+
+  <div class="form-actions"><button class="btn ghost" id="cancel" type="button">Cancel</button><button class="btn" type="submit">Save update</button></div>
 </form>
 </dialog>
+
 <script>
-(()=>{
+(() => {
 'use strict';
-const STORAGE_KEY='telangana-farmer-alerts-v1';
-const $=s=>document.querySelector(s);
-let alerts=[], activeCategory='All';
-try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');if(Array.isArray(data))alerts=data;}catch(e){alerts=[];}
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const points=v=>String(v||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(alerts));render();}
-function render(){
- const query=$('#search').value.trim().toLocaleLowerCase();
- const shown=alerts.filter(a=>(activeCategory==='All'||a.category===activeCategory)&&(!query||[a.title,a.titleTe,a.department,a.state,...(a.pointsTe||[]),...(a.pointsEn||[])].join(' ').toLocaleLowerCase().includes(query)));
- $('#count').textContent=shown.length;
- $('#status').textContent=alerts.length?`${shown.length} shown · ${alerts.length} saved in this browser`:'No alerts added yet';
- $('#alerts').innerHTML=shown.map(a=>`<article class="alert">
-   <div class="alert-top"><div class="badges"><span class="badge ${/proposal/i.test(a.state)?'proposal':/open/i.test(a.state)?'open':''}">${esc(a.state)}</span><span class="badge">${esc(a.category)}</span></div></div>
-   <h3>${esc(a.titleTe||a.title)}</h3>
-   ${a.titleTe?`<div style="font-weight:650">${esc(a.title)}</div>`:''}
-   <div class="meta">📅 ${esc(a.date)} &nbsp;·&nbsp; 🏛️ ${esc(a.department)}</div>
-   <div class="lang-title">తెలుగు ముఖ్యాంశాలు</div><ul class="points">${(a.pointsTe||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
-   <div class="lang-title">Key points in English</div><ul class="points">${(a.pointsEn||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
-   <div class="alert-actions"><a href="${esc(a.url)}" target="_blank" rel="noopener">Official notification / అధికారిక ప్రకటన ↗</a><button type="button" class="btn btn-light remove" data-id="${esc(a.id)}">Remove</button></div>
- </article>`).join('');
- $('#empty').hidden=shown.length>0;
- document.querySelectorAll('.remove').forEach(b=>b.addEventListener('click',()=>{if(confirm('Remove this alert from this browser?')){alerts=alerts.filter(a=>a.id!==b.dataset.id);save();}}));
+const STORAGE_KEY = 'telangana-farmer-alerts-v1'; // unchanged, so existing saved alerts still load
+const $ = s => document.querySelector(s);
+
+const TOPICS = [
+  {key:'All', te:'అన్నీ', en:'All updates', ico:'🌾'},
+  {key:'Loans', te:'రుణాలు', en:'Loans', ico:'🏦'},
+  {key:'Payments', te:'చెల్లింపులు', en:'Payments', ico:'💰'},
+  {key:'Subsidies', te:'సబ్సిడీలు', en:'Subsidies', ico:'🌱'},
+  {key:'Land', te:'భూ రికార్డులు', en:'Land records', ico:'📜'},
+  {key:'Crops & MSP', te:'పంటలు, మద్దతు ధర', en:'Crops & MSP', ico:'🌽'},
+  {key:'Insurance', te:'బీమా', en:'Insurance', ico:'☂️'},
+  {key:'Central schemes', te:'కేంద్ర పథకాలు', en:'Central schemes', ico:'🏛️'},
+  {key:'Other', te:'ఇతరాలు', en:'Other', ico:'📌'}
+];
+const STATES = {
+  'Approved Government Order': {te:'ఆమోదించిన ఉత్తర్వు', kind:'ok'},
+  'Approved scheme / decision': {te:'ఆమోదించిన నిర్ణయం', kind:'ok'},
+  'Applications open': {te:'దరఖాస్తులు ప్రారంభం', kind:'open'},
+  'Payments announced': {te:'చెల్లింపుల ప్రకటన', kind:'ok'},
+  'Procurement approved': {te:'కొనుగోలు ఆమోదం', kind:'ok'},
+  'Advisory / information': {te:'సూచన / సమాచారం', kind:'ok'},
+  'Proposal / request only': {te:'ప్రతిపాదన మాత్రమే', kind:'proposal'},
+  'Expired / closed': {te:'ముగిసింది', kind:'closed'},
+  'Superseded by a newer notice': {te:'కొత్త ఉత్తర్వుతో మార్చబడింది', kind:'closed'}
+};
+const FULLTEXT = {
+  full: {te:'పూర్తిగా చదివాం', en:'Full notice read'},
+  partial: {te:'కొంత భాగం మాత్రమే', en:'Partly read'},
+  scanned: {te:'సమీక్ష అవసరం', en:'Scanned, needs review'}
+};
+
+let alerts = [];
+let activeTopic = 'All';
+
+/* ---------- storage ---------- */
+function load() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    alerts = Array.isArray(data) ? data.map(normalise).filter(Boolean) : [];
+  } catch (e) { alerts = []; }
 }
-const dialog=$('#editor');
-function openEditor(){dialog.showModal();}
-$('#add').addEventListener('click',openEditor);$('#addFirst').addEventListener('click',openEditor);
-$('#cancel').addEventListener('click',()=>dialog.close());
-$('#search').addEventListener('input',render);
-$('#filters').querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{activeCategory=b.dataset.cat;$('#filters').querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===b));render();}));
-$('#alertForm').addEventListener('submit',e=>{
- e.preventDefault();
- const fd=new FormData(e.currentTarget),a=Object.fromEntries(fd.entries());
- try{const u=new URL(a.url);if(!['https:','http:'].includes(u.protocol))throw Error();}catch(err){alert('Enter a valid official http(s) URL.');return;}
- a.pointsTe=points(a.pointsTe);a.pointsEn=points(a.pointsEn);
- if(!a.pointsTe.length||!a.pointsEn.length){alert('Add at least one Telugu and one English bullet point.');return;}
- const duplicate=alerts.some(old=>old.url.replace(/\/$/,'')===a.url.replace(/\/$/,''));
- if(duplicate&&!confirm('An alert with this URL already exists. Add it again anyway?'))return;
- a.id=(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
- alerts.unshift(a);save();e.currentTarget.reset();dialog.close();
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(alerts)); }
+  catch (e) { alert('Could not save in this browser (storage is full or blocked). Save a backup file now.'); }
+  render();
+}
+
+/* ---------- safety helpers ---------- */
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lines = v => (Array.isArray(v) ? v : String(v || '').split(/\r?\n/)).map(s => String(s).trim()).filter(Boolean);
+function safeUrl(u) {
+  try { const p = new URL(String(u)); return ['https:', 'http:'].includes(p.protocol) ? p.href : null; }
+  catch (e) { return null; }
+}
+const urlKey = u => String(u || '').trim().replace(/\/$/, '');
+const isDate = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
+
+// Accept old and imported records safely; drop anything without a valid official link.
+function normalise(a) {
+  if (!a || typeof a !== 'object') return null;
+  const url = safeUrl(a.url);
+  if (!url || !a.title) return null;
+  return {
+    id: String(a.id || (crypto.randomUUID ? crypto.randomUUID() : Date.now() + Math.random())),
+    title: String(a.title).slice(0, 180),
+    titleTe: String(a.titleTe || '').slice(0, 180),
+    date: isDate(a.date) ? a.date : '',
+    deadline: isDate(a.deadline) ? a.deadline : '',
+    checked: isDate(a.checked) ? a.checked : '',
+    department: String(a.department || '').slice(0, 120),
+    category: TOPICS.some(t => t.key === a.category) ? a.category : 'Other',
+    state: STATES[a.state] ? a.state : 'Advisory / information',
+    fullText: FULLTEXT[a.fullText] ? a.fullText : 'full',
+    pointsTe: lines(a.pointsTe),
+    pointsEn: lines(a.pointsEn),
+    url
+  };
+}
+
+/* ---------- dates ---------- */
+const today = () => new Date().toISOString().slice(0, 10);
+function fmt(d) {
+  if (!isDate(d)) return null;
+  const dt = new Date(d + 'T00:00:00');
+  try { return dt.toLocaleDateString('te-IN', {day:'numeric', month:'long', year:'numeric'}); }
+  catch (e) { return d; }
+}
+function fmtEn(d) {
+  if (!isDate(d)) return null;
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+}
+
+/* ---------- render ---------- */
+function renderTopics() {
+  $('#topics').innerHTML = TOPICS.map(t =>
+    `<button type="button" class="topic" data-topic="${esc(t.key)}" aria-pressed="${t.key === activeTopic}">
+       <span class="ico" aria-hidden="true">${t.ico}</span><span class="te">${esc(t.te)}</span><span class="en">${esc(t.en)}</span>
+     </button>`).join('');
+}
+function isClosed(a) { return STATES[a.state].kind === 'closed'; }
+function deadlinePassed(a) { return a.deadline && a.deadline < today() && !isClosed(a); }
+
+function alertCard(a) {
+  const st = STATES[a.state];
+  const ft = FULLTEXT[a.fullText];
+  const topic = TOPICS.find(t => t.key === a.category) || TOPICS[TOPICS.length - 1];
+  const cls = st.kind === 'proposal' ? 'is-proposal' : st.kind === 'open' ? 'is-open' : st.kind === 'closed' ? 'is-closed' : '';
+  const tagCls = st.kind === 'ok' ? '' : st.kind;
+  const deadline = a.deadline
+    ? `${fmt(a.deadline)}<span class="en">${fmtEn(a.deadline)}</span>`
+    : `ప్రకటించలేదు<span class="en">Not specified</span>`;
+  return `<article class="alert ${cls}">
+    <div class="tags">
+      <span class="tag ${tagCls}">${esc(st.te)} · ${esc(a.state)}</span>
+      <span class="tag plain">${topic.ico} ${esc(topic.te)}</span>
+      ${deadlinePassed(a) ? '<span class="tag closed">గడువు ముగిసింది · Deadline passed</span>' : ''}
+    </div>
+    <h3>${esc(a.titleTe || a.title)}</h3>
+    ${a.titleTe ? `<p class="title-en">${esc(a.title)}</p>` : ''}
+    <div class="facts">
+      <div class="fact"><span class="k">ప్రచురణ తేదీ · Published</span><span class="v">${a.date ? `${fmt(a.date)}<span class="en">${fmtEn(a.date)}</span>` : 'ప్రకటించలేదు<span class="en">Not stated</span>'}</span></div>
+      <div class="fact ${deadlinePassed(a) ? 'warn' : ''}"><span class="k">చివరి తేదీ · Deadline</span><span class="v">${deadline}</span></div>
+      <div class="fact"><span class="k">జారీ చేసిన శాఖ · Department</span><span class="v">${esc(a.department || '—')}</span></div>
+      <div class="fact ${a.fullText !== 'full' ? 'warn' : ''}"><span class="k">ప్రకటన చదివిన స్థితి · Notice read</span><span class="v">${esc(ft.te)}<span class="en">${esc(ft.en)}</span></span></div>
+    </div>
+    <div class="points-wrap">
+      <div><h4>తెలుగులో ముఖ్యాంశాలు</h4><ul class="points">${a.pointsTe.map(p => `<li>${esc(p)}</li>`).join('')}</ul></div>
+      <div><h4>Key points in English</h4><ul class="points points-en">${a.pointsEn.map(p => `<li>${esc(p)}</li>`).join('')}</ul></div>
+    </div>
+    <div class="alert-foot">
+      <a class="open-notice" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">అధికారిక ప్రకటన చూడండి <span class="en">Open official notice</span></a>
+      <span class="count">${a.checked ? `చివరిగా సరిచూసింది · Last checked: ${esc(fmtEn(a.checked))}` : ''}</span>
+      <button type="button" class="remove" data-id="${esc(a.id)}">Remove</button>
+    </div>
+  </article>`;
+}
+
+function render() {
+  const q = $('#search').value.trim().toLocaleLowerCase();
+  const shown = alerts
+    .filter(a => activeTopic === 'All' || a.category === activeTopic)
+    .filter(a => !q || [a.title, a.titleTe, a.department, a.state, ...a.pointsTe, ...a.pointsEn].join(' ').toLocaleLowerCase().includes(q))
+    // open items first, then newest first
+    .sort((x, y) => (isClosed(x) - isClosed(y)) || String(y.date).localeCompare(String(x.date)));
+
+  $('#alerts').innerHTML = shown.map(alertCard).join('');
+  $('#count').textContent = alerts.length ? `${shown.length} చూపిస్తున్నాం · ${shown.length} of ${alerts.length} shown` : '';
+
+  const empty = $('#empty');
+  empty.hidden = shown.length > 0;
+  if (!shown.length && alerts.length) {
+    $('#emptyTitle').textContent = 'ఈ విషయంలో సమాచారం లేదు';
+    $('#emptyText').innerHTML = 'వేరే విషయం ఎంచుకోండి లేదా వేరే పదంతో వెతకండి.<br>No updates match. Pick another topic or try a different word.';
+  } else if (!alerts.length) {
+    $('#emptyTitle').textContent = 'ఇంకా సమాచారం లేదు';
+    $('#emptyText').innerHTML = 'అధికారిక ప్రకటన సరిచూసిన తర్వాతే ఇక్కడ సమాచారం చేర్చబడుతుంది. త్వరలో మళ్లీ చూడండి.<br>No updates yet. An update is added here only after it has been checked against the official notice.';
+  }
+}
+
+/* ---------- events ---------- */
+$('#topics').addEventListener('click', e => {
+  const btn = e.target.closest('[data-topic]');
+  if (!btn) return;
+  activeTopic = btn.dataset.topic;
+  document.querySelectorAll('.topic').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+  render();
 });
-$('#export').addEventListener('click',()=>{
- const blob=new Blob([JSON.stringify(alerts,null,2)],{type:'application/json'});
- const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='telangana-farmer-alerts-backup.json';a.click();URL.revokeObjectURL(url);
+$('#search').addEventListener('input', render);
+$('#alerts').addEventListener('click', e => {
+  const btn = e.target.closest('.remove');
+  if (!btn) return;
+  if (confirm('Remove this update from this browser? Closed updates are better marked "Expired" so the history is kept.')) {
+    alerts = alerts.filter(a => a.id !== btn.dataset.id);
+    save();
+  }
 });
-$('#import').addEventListener('click',()=>$('#file').click());
-$('#file').addEventListener('change',async e=>{
- const f=e.target.files[0];if(!f)return;
- try{const imported=JSON.parse(await f.text());if(!Array.isArray(imported)||!imported.every(a=>a&&a.title&&a.url&&Array.isArray(a.pointsTe)&&Array.isArray(a.pointsEn)))throw Error('Invalid format');
- const known=new Set(alerts.map(a=>String(a.url).replace(/\/$/,'')));let added=0;
- for(const a of imported){const key=String(a.url).replace(/\/$/,'');if(!known.has(key)){alerts.push(a);known.add(key);added++;}}
- save();alert(`Imported ${added} new alert(s). Existing official URLs were skipped.`);
- }catch(err){alert('Could not import this file. Please select a backup exported from this website.');}
- e.target.value='';
+
+// form
+$('#category').innerHTML = TOPICS.filter(t => t.key !== 'All').map(t => `<option value="${esc(t.key)}">${esc(t.te)} — ${esc(t.en)}</option>`).join('');
+$('#state').innerHTML = Object.entries(STATES).map(([k, v]) => `<option value="${esc(k)}">${esc(v.te)} — ${esc(k)}</option>`).join('');
+const dialog = $('#editor');
+$('#add').addEventListener('click', () => { $('#checked').value = today(); dialog.showModal(); });
+$('#cancel').addEventListener('click', () => dialog.close());
+
+$('#alertForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const raw = Object.fromEntries(new FormData(e.currentTarget).entries());
+  if (!safeUrl(raw.url)) { alert('Enter a valid official link starting with https://'); return; }
+  if (!lines(raw.pointsTe).length || !lines(raw.pointsEn).length) { alert('Add at least one Telugu and one English point.'); return; }
+  if (raw.deadline && raw.date && raw.deadline < raw.date) { alert('The deadline is before the publication date. Please check both dates.'); return; }
+  const a = normalise(raw);
+  if (alerts.some(old => urlKey(old.url) === urlKey(a.url)) && !confirm('An update with this link already exists. Add it again anyway?')) return;
+  alerts.unshift(a);
+  save();
+  e.currentTarget.reset();
+  dialog.close();
+  $('#alertsTitle').scrollIntoView({behavior: 'smooth', block: 'start'});
 });
+
+// backup
+$('#export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(alerts, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob), link = document.createElement('a');
+  link.href = url; link.download = `farmer-alerts-backup-${today()}.json`; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+$('#import').addEventListener('click', () => $('#file').click());
+$('#file').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    const imported = JSON.parse(await f.text());
+    if (!Array.isArray(imported)) throw new Error('not a list');
+    const known = new Set(alerts.map(a => urlKey(a.url)));
+    let added = 0, skipped = 0;
+    for (const item of imported) {
+      const a = normalise(item);
+      if (!a || !a.pointsTe.length || !a.pointsEn.length) { skipped++; continue; }
+      if (known.has(urlKey(a.url))) continue;
+      alerts.push(a); known.add(urlKey(a.url)); added++;
+    }
+    save();
+    alert(`Loaded ${added} new update(s).` + (skipped ? ` ${skipped} item(s) were skipped because they had no valid official link or points.` : ''));
+  } catch (err) {
+    alert('This file could not be loaded. Choose a backup file saved from this website.');
+  }
+  e.target.value = '';
+});
+
+load();
+renderTopics();
 render();
 })();
 </script>
 </body>
-</html>'''
-path = Path("/mnt/data/index.html")
-path.write_text(html, encoding="utf-8")
-print(f"Created {path} ({path.stat().st_size:,} bytes)")
+</html>
