@@ -22,7 +22,8 @@ h2{font-size:20px;margin:0 0 4px;color:var(--green)}.hint{font-size:13px;color:v
 .breakdown{font-size:14px}.breakdown div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line)}.breakdown span:last-child{text-align:right;font-weight:650;white-space:nowrap}.breakdown .total{font-size:16px;font-weight:800;border-bottom:0;border-top:2px solid var(--line);margin-top:5px;padding-top:11px}
 .profit{padding:12px;border-radius:10px;background:var(--pale);margin-top:12px}.profit.negative{background:#fff0ed}.profit small{display:block;color:var(--muted)}.profit strong{font-size:24px;overflow-wrap:anywhere}
 .table-wrap{width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:12px 0}
-.comparison{width:100%;border-collapse:collapse;background:#fff;font-size:14px}
+.comparison,.input-table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}
+.input-table{margin:10px 0 14px}.input-table th,.input-table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}.input-table thead th{background:var(--pale);color:var(--green);text-align:left;font-weight:800}.input-table tbody th{text-align:left;font-weight:650;width:48%}.input-table td{width:52%}.input-table input{width:100%;min-width:80px;font:inherit;padding:9px 10px;border:1px solid #bdcdb9;border-radius:8px;background:#fff;color:var(--ink)}.input-table small{display:block;color:var(--muted);font-size:11px;font-weight:400}@media(max-width:600px){.input-table th,.input-table td{padding:8px 7px;font-size:12px}.input-table input{padding:8px 6px}}
 .comparison th,.comparison td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
 .comparison thead th{background:var(--pale);color:var(--green);font-weight:800}
 .comparison th:first-child{text-align:left;min-width:190px}
@@ -50,16 +51,15 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 
 <section class="panel">
 <h2>1. Crop and sale details · పంట వివరాలు</h2><p class="hint">Enter crop quantity, selling rates and weight deductions here. Cultivation expenses and sale charges are entered separately below.</p>
-<div class="grid">
-<div class="field"><label for="qty">Harvest quantity (quintals)</label><input id="qty" type="number" min="0" step="0.01" value="200"></div>
-<div class="field"><label for="govRate">Government price (₹/quintal)</label><input id="govRate" type="number" min="0" step="1" value="2460"></div>
-<div class="field"><label for="privateRate">Private buyer price (₹/quintal)</label><input id="privateRate" type="number" min="0" step="1" value="2100"></div>
-<div class="field"><label for="startMoisture">Starting moisture (%) · ప్రారంభ తేమ</label><input id="startMoisture" type="number" min="0" max="99.9" step="0.1" placeholder="Unknown — leave blank"><small>Enter the measured moisture reading. Leave blank if not known.</small></div>
-<div class="field"><label for="targetMoisture">Target moisture after drying (%)</label><input id="targetMoisture" type="number" min="0.1" max="99.9" step="0.1" value="17"><small>Default 17% — verify the applicable procurement specification.</small></div>
-<div class="field"><label for="govTharugu">Government tharugu (kg/quintal)</label><input id="govTharugu" type="number" min="0" max="99" step="0.1" value="6"></div>
-<div class="field"><label for="privateTharugu">Private tharugu (kg/quintal)</label><input id="privateTharugu" type="number" min="0" max="99" step="0.1" value="4"></div>
-
-</div>
+<div class="table-wrap"><table class="input-table"><thead><tr><th>Crop / sale setting · పంట వివరాలు</th><th>Enter value</th></tr></thead><tbody>
+<tr><th><label for="qty">Harvest quantity (quintals)</label></th><td><input id="qty" type="number" min="0" step="0.01" value="200"></td></tr>
+<tr><th><label for="govRate">Government price (₹/quintal)</label></th><td><input id="govRate" type="number" min="0" step="1" value="2460"></td></tr>
+<tr><th><label for="privateRate">Private buyer price (₹/quintal)</label></th><td><input id="privateRate" type="number" min="0" step="1" value="2100"></td></tr>
+<tr><th><label for="startMoisture">Starting moisture (%) · ప్రారంభ తేమ</label></th><td><input id="startMoisture" type="number" min="0" max="99.9" step="0.1" value="26"><small>Estimated default: 26%. Replace with measured reading if available.</small></td></tr>
+<tr><th><label for="targetMoisture">Target moisture after drying (%)</label></th><td><input id="targetMoisture" type="number" min="0.1" max="99.9" step="0.1" value="17"><small>17% target is not a flat weight deduction.</small></td></tr>
+<tr><th><label for="govTharugu">Government tharugu (kg/quintal)</label></th><td><input id="govTharugu" type="number" min="0" max="99" step="0.1" value="6"></td></tr>
+<tr><th><label for="privateTharugu">Private tharugu (kg/quintal)</label></th><td><input id="privateTharugu" type="number" min="0" max="99" step="0.1" value="4"></td></tr>
+</tbody></table></div>
 <div class="notice" id="moistureNotice" aria-live="polite">Drying loss is calculated from measured starting moisture and target moisture. If starting moisture is unknown, no automatic drying-weight deduction is applied. Enter tharugu separately and confirm whether the buyer's deduction already includes moisture loss.</div>
 </section>
 
@@ -68,26 +68,26 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <p class="hint">Keep cultivation expenses and selling charges in this separate section. Open it only when you want to enter or update costs.</p>
 <button class="btn" id="toggleInvestment" type="button" aria-expanded="false" aria-controls="investmentFields">+ Enter cultivation investment &amp; sale charges</button>
 <div id="investmentFields" hidden>
-<div class="cost-list">
-<div class="field"><label for="seed">Seeds / nursery (₹)</label><input class="cost" id="seed" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="landPrep">Land preparation / ploughing (₹)</label><input class="cost" id="landPrep" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="planting">Transplanting / sowing labour (₹)</label><input class="cost" id="planting" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="fertilizer">Fertilizers / manure (₹)</label><input class="cost" id="fertilizer" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="pesticide">Pesticides / herbicides (₹)</label><input class="cost" id="pesticide" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="water">Irrigation / electricity / diesel (₹)</label><input class="cost" id="water" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="labour">Other farm labour (₹)</label><input class="cost" id="labour" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="rent">Land rent / lease (₹)</label><input class="cost" id="rent" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="interest">Loan interest / finance cost (₹)</label><input class="cost" id="interest" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="misc">Other expenses (₹)</label><input class="cost" id="misc" type="number" min="0" step="100" value="0"></div>
-</div>
-<h3 style="margin:18px 0 8px;color:var(--green)">Transport / sale charges · రవాణా మరియు అమ్మకం ఖర్చులు</h3>
+<div class="table-wrap"><table class="input-table"><thead><tr><th>Cultivation expense · పెట్టుబడి ఖర్చు</th><th>Amount (₹)</th></tr></thead><tbody>
+<tr><th><label for="seed">Seeds / nursery</label></th><td><input id="seed" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="landPrep">Land preparation / ploughing</label></th><td><input id="landPrep" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="planting">Transplanting / sowing labour</label></th><td><input id="planting" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="fertilizer">Fertilizers / manure</label></th><td><input id="fertilizer" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="pesticide">Pesticides / herbicides</label></th><td><input id="pesticide" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="water">Irrigation / electricity / diesel</label></th><td><input id="water" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="labour">Other farm labour</label></th><td><input id="labour" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="rent">Land rent / lease</label></th><td><input id="rent" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="interest">Loan interest / finance cost</label></th><td><input id="interest" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="misc">Other expenses</label></th><td><input id="misc" type="number" min="0" step="100" value="0"></td></tr>
+</tbody></table></div>
+<h3 style="margin:18px 0 8px;color:var(--green)">Transport/ / sale charges · రవాణా మరియు అమ్మకం ఖర్చులు</h3>
 <p class="hint">These are entered here, not under crop details. They are deducted only from the matching sale option.</p>
-<div class="cost-list">
-<div class="field"><label for="amali">Government amali (₹/quintal)</label><input id="amali" type="number" min="0" step="1" value="48"></div>
-<div class="field"><label for="govDryCost">Government-sale drying cost (₹ total)</label><input id="govDryCost" type="number" min="0" step="100" value="30000"></div>
-<div class="field"><label for="govTransport">Government transport / other sale charges (₹)</label><input id="govTransport" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="privateTransport">Private transport / other sale charges (₹)</label><input id="privateTransport" type="number" min="0" step="100" value="0"></div>
-</div>
+<div class="table-wrap"><table class="input-table"><thead><tr><th>Sale-specific charge · అమ్మకం ఖర్చు</th><th>Amount</th></tr></thead><tbody>
+<tr><th><label for="amali">Government amali (₹/quintal)</label></th><td><input id="amali" type="number" min="0" step="1" value="48"></td></tr>
+<tr><th><label for="govDryCost">Government-sale drying cost (₹ total)</label></th><td><input id="govDryCost" type="number" min="0" step="100" value="30000"></td></tr>
+<tr><th><label for="govTransport">Government transport / other sale charges (₹)</label></th><td><input id="govTransport" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="privateTransport">Private transport / other sale charges (₹)</label></th><td><input id="privateTransport" type="number" min="0" step="100" value="0"></td></tr>
+</tbody></table></div>
 <div class="result-grid">
 <div class="metric"><span>Total cultivation investment</span><strong id="totalCost">₹0</strong></div>
 <div class="metric"><span>Investment per original quintal</span><strong id="costPerQ">₹100</strong></div>
@@ -175,7 +175,7 @@ function calculate(){
 }
 ids.forEach(id=>$(id).addEventListener('input',calculate));
 $('reset').addEventListener('click',()=>{
- const defaults={qty:200,govRate:2460,privateRate:2100,startMoisture:'',targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,govDryCost:30000,govTransport:0,privateTransport:0,seed:0,landPrep:0,planting:0,fertilizer:0,pesticide:0,water:0,labour:0,rent:0,interest:0,misc:0};
+ const defaults={qty:200,govRate:2460,privateRate:2100,startMoisture:26,targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,govDryCost:30000,govTransport:0,privateTransport:0,seed:0,landPrep:0,planting:0,fertilizer:0,pesticide:0,water:0,labour:0,rent:0,interest:0,misc:0};
  Object.entries(defaults).forEach(([id,v])=>$(id).value=v);calculate();
 });
 $('toggleInvestment').addEventListener('click',()=>{
