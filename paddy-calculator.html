@@ -10,6 +10,11 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 header{background:var(--green);color:white;padding:18px 16px}header .wrap,main,footer{max-width:1080px;margin:auto}header a{color:#e4f1df;text-decoration:none;font-size:14px}h1{font-size:clamp(24px,4vw,36px);line-height:1.15;margin:10px 0 6px}header p{margin:0;color:#e2eee0}.wrap{max-width:1080px;margin:auto}
 main{padding:20px 14px 40px}.intro{margin:0 0 18px;color:var(--muted)}
+.price-reference{margin:0 0 16px;padding:12px 15px;border:1px solid #d7e5d0;border-left:4px solid var(--green);border-radius:12px;background:#f7fbf4;font-size:14px}
+.price-reference strong{display:block;color:var(--green);font-size:15px;margin-bottom:5px}
+.price-reference p{margin:4px 0}
+.price-reference .price-note{font-size:12px;color:var(--muted)}
+.price-reference a{display:inline-block;margin-top:5px;color:var(--green);font-weight:750;text-decoration:underline}
 .panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 3px 12px #183c1708}
 h2{font-size:20px;margin:0 0 4px;color:var(--green)}.hint{font-size:13px;color:var(--muted);margin:0 0 14px}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -49,11 +54,17 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <main>
 <p class="intro">Enter your own costs and current buyer offers. Calculations update automatically. All amounts are in Indian rupees (₹).</p>
 
+<aside class="price-reference" aria-label="Official paddy MSP reference">
+<strong>వరి మద్దతు ధర · Official Paddy MSP Reference</strong>
+<p><b>KMS 2026–27:</b> Common paddy ₹2,441/quintal · Grade A ₹2,461/quintal.</p>
+<p class="price-note">These are Government of India MSP rates, not a guarantee of final payment. Procurement eligibility, quality and deductions may affect the amount. Check the official notification before selling.</p>
+<a href="https://www.pib.gov.in/PressReleasePage.aspx?PRID=2269182&amp;lang=1&amp;reg=48" target="_blank" rel="noopener noreferrer">Check official MSP notification ↗</a>
+</aside>
 <section class="panel">
 <h2>1. Crop and sale details · పంట వివరాలు</h2><p class="hint">Enter crop quantity, selling rates and weight deductions here. Cultivation expenses and sale charges are entered separately below.</p>
 <div class="table-wrap"><table class="input-table"><thead><tr><th>Crop / sale setting · పంట వివరాలు</th><th>Enter value</th></tr></thead><tbody>
 <tr><th><label for="qty">Harvest quantity (quintals)</label></th><td><input id="qty" type="number" min="0" step="0.01" value="200"></td></tr>
-<tr><th><label for="govRate">Government price (₹/quintal)</label></th><td><input id="govRate" type="number" min="0" step="1" value="2460"></td></tr>
+<tr><th><label for="govRate">Government price (₹/quintal)</label></th><td><input id="govRate" type="number" min="0" step="1" value="2441"></td></tr>
 <tr><th><label for="privateRate">Private buyer price (₹/quintal)</label></th><td><input id="privateRate" type="number" min="0" step="1" value="2100"></td></tr>
 <tr><th><label for="startMoisture">Starting moisture (%) · ప్రారంభ తేమ</label></th><td><input id="startMoisture" type="number" min="0" max="99.9" step="0.1" value="26"><small>Estimated default: 26%. Replace with measured reading if available.</small></td></tr>
 <tr><th><label for="targetMoisture">Target moisture after drying (%)</label></th><td><input id="targetMoisture" type="number" min="0.1" max="99.9" step="0.1" value="17"><small>17% target is not a flat weight deduction.</small></td></tr>
@@ -175,7 +186,7 @@ function calculate(){
 }
 ids.forEach(id=>$(id).addEventListener('input',calculate));
 $('reset').addEventListener('click',()=>{
- const defaults={qty:200,govRate:2460,privateRate:2100,startMoisture:26,targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,govDryCost:30000,govTransport:0,privateTransport:0,seed:0,landPrep:0,planting:0,fertilizer:0,pesticide:0,water:0,labour:0,rent:0,interest:0,misc:0};
+ const defaults={qty:200,govRate:2441,privateRate:2100,startMoisture:26,targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,govDryCost:30000,govTransport:0,privateTransport:0,seed:0,landPrep:0,planting:0,fertilizer:0,pesticide:0,water:0,labour:0,rent:0,interest:0,misc:0};
  Object.entries(defaults).forEach(([id,v])=>$(id).value=v);calculate();
 });
 $('toggleInvestment').addEventListener('click',()=>{
