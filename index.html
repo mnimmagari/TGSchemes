@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H1wtRssHKK5S7znYfO2WDTX8b74skB81eJygJe7FwOw='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xJJ6NeZDrKSv6V7ZYsSnUWPbjC0FD4/v0fA35aBGpRw='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#1F4D2B">
 <meta name="description" content="Telangana and Central Government farmer announcements in simple Telugu and English.">
 <title>రైతు సమాచారం · Telangana Farmer Alerts</title>
@@ -433,18 +433,28 @@ function saveLocal() {
   render();
 }
 async function loadFeed() {
+  const bar = $('#checkBar'), text = $('#checkText'), en = $('#checkEn');
+  // Time out slow requests and show a useful status instead of staying on Loading…
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
   try {
-    const res = await fetch(`${FEED_URL}?t=${Date.now()}`, {cache: 'no-store'});
-    if (!res.ok) throw new Error(res.status);
+    const res = await fetch(`${FEED_URL}?t=${Date.now()}`, {cache: 'no-store', signal: controller.signal});
+    if (!res.ok) throw new Error(`Feed request failed (${res.status})`);
     const data = await res.json();
     feedMeta = {lastChecked: data.lastChecked ? new Date(data.lastChecked) : null};
     if (feedMeta.lastChecked && isNaN(feedMeta.lastChecked)) feedMeta.lastChecked = null;
     feedAlerts = (Array.isArray(data.alerts) ? data.alerts : []).map(a => normalise(a, 'feed')).filter(Boolean);
   } catch (e) {
-    feedMeta = null; feedAlerts = [];
+    feedMeta = null;
+    feedAlerts = [];
+    bar.classList.add('off');
+    text.textContent = 'నోటిఫికేషన్లు లోడ్ కాలేదు';
+    en.textContent = 'Could not load alerts. Check your connection or try refreshing the page.';
+  } finally {
+    clearTimeout(timeoutId);
+    renderCheck();
+    render();
   }
-  renderCheck();
-  render();
 }
 
 /* ---------- render ---------- */
