@@ -147,8 +147,6 @@ function calculate(){
  $('govCharges').textContent='−'+money(govCharges); $('privateCharges').textContent='−'+money(privateCharges);
  $('govCultivation').textContent='−'+money(cultivation); $('privateCultivation').textContent='−'+money(cultivation);
  $('govTableProfit').textContent=money(govProfit); $('privateTableProfit').textContent=money(privateProfit);
- $('govProfit').textContent=money(govProfit); $('privateProfit').textContent=money(privateProfit);
- $('govProfitBox').classList.toggle('negative',govProfit<0); $('privateProfitBox').classList.toggle('negative',privateProfit<0);
  const diff=privateProfit-govProfit;
  $('difference').textContent=money(Math.abs(diff));
  $('govPerQ').textContent=money(qty?(govGross-govCharges)/qty:0);
