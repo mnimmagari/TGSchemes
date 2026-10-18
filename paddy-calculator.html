@@ -91,9 +91,12 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <tr><th>Saleable quantity after moisture loss and tharugu</th><td id="govQty">—</td><td id="privateQty">—</td></tr>
 <tr><th>Moisture-related weight loss</th><td id="govDryLoss">—</td><td id="privateDryLoss">—</td></tr>
 <tr><th>Sale revenue</th><td id="govRevenue">—</td><td id="privateRevenue">—</td></tr>
-<tr><th>Amali / drying labour / other charges</th><td id="govCharges">—</td><td id="privateCharges">—</td></tr>
-<tr><th>Cultivation investment</th><td id="govCultivation">—</td><td id="privateCultivation">—</td></tr>
-<tr class="final-row"><th>Final profit / loss</th><td id="govTableProfit">—</td><td id="privateTableProfit">—</td></tr>
+<tr><th>Government amali charge</th><td id="govAmaliResult">—</td><td>—</td></tr>
+<tr><th>Government drying labour</th><td id="govDryResult">—</td><td>—</td></tr>
+<tr><th>Government other charges</th><td id="govOtherResult">—</td><td>—</td></tr>
+<tr><th>Private drying labour</th><td>—</td><td id="privateDryResult">—</td></tr>
+<tr><th>Private other charges</th><td>—</td><td id="privateOtherResult">—</td></tr>
+<tr class="final-row"><th>Estimated amount after entered sale charges</th><td id="govTableProfit">—</td><td id="privateTableProfit">—</td></tr>
 </tbody>
 </table>
 </div>
@@ -130,7 +133,7 @@ function calculate(){
  $('govQty').textContent=fmtQ(gq);$('privateQty').textContent=fmtQ(pq);
  $('govDryLoss').textContent=loss===null?'Not estimated':fmtQ(loss);$('privateDryLoss').textContent=loss===null?'Not estimated':fmtQ(loss);
  $('govRevenue').textContent=money(gr);$('privateRevenue').textContent=money(pr);
- $('govCharges').textContent='Amali '+money(amaliCost)+' · Drying '+money(govDry)+' · Other '+money(govOther);$('privateCharges').textContent='Drying '+money(privateDry)+' · Other '+money(privateOther);
+ $('govAmaliResult').textContent='−'+money(amaliCost);$('govDryResult').textContent='−'+money(govDry);$('govOtherResult').textContent='−'+money(govOther);$('privateDryResult').textContent='−'+money(privateDry);$('privateOtherResult').textContent='−'+money(privateOther);
  $('govTableProfit').textContent=money(ga);$('privateTableProfit').textContent=money(pa);
  const diff=pa-ga;$('difference').textContent=money(Math.abs(diff));
  $('govPerQ').textContent=money(qty?ga/qty:0);$('privatePerQ').textContent=money(qty?pa/qty:0);
