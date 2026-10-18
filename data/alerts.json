@@ -1,4 +1,75 @@
 {
   "lastChecked": "2026-10-18T14:30:06+05:30",
-  "alerts": []
+  "alerts": [
+    {
+      "id": "pib-2026-10-nmmss-2323830",
+      "title": "NMMSS scholarship applications: deadline 31 October 2026",
+      "titleTe": "NMMSS విద్యార్థి ఉపకార వేతనం: దరఖాస్తులకు అక్టోబర్ 31 చివరి తేదీ",
+      "date": "2026-10-15",
+      "deadline": "2026-10-31",
+      "addedAt": "2026-10-18",
+      "department": "Ministry of Education · School Education & Literacy",
+      "category": "Other",
+      "state": "Applications open",
+      "fullText": "full",
+      "review": "checked",
+      "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2323830&lang=1&reg=3",
+      "pointsTe": [
+        "2026–27 విద్యా సంవత్సరానికి NMMSS దరఖాస్తుల చివరి తేదీ 31 అక్టోబర్ 2026.",
+        "అర్హులైన విద్యార్థులకు సంవత్సరానికి ₹12,000 ఉపకార వేతనం అందుతుంది.",
+        "దరఖాస్తు, అర్హత మరియు పాఠశాల ధృవీకరణ వివరాలను అధికారిక ప్రకటనలో పరిశీలించండి."
+      ],
+      "pointsEn": [
+        "NMMSS applications for academic year 2026–27 close on 31 October 2026.",
+        "Eligible students receive a scholarship of ₹12,000 per year.",
+        "Check eligibility, application and school verification details in the official release."
+      ]
+    },
+    {
+      "id": "pib-2026-10-pmddky-2322267",
+      "title": "PM Dhan-Dhaanya Krishi Yojana: first-year update and Khet Bachao Abhiyan",
+      "titleTe": "పీఎం ధన్-ధాన్య కృషి యోజన: ఏడాది పురోగతి, ఖేత్ బచావో అభియాన్",
+      "date": "2026-10-12",
+      "addedAt": "2026-10-18",
+      "department": "Ministry of Agriculture & Farmers Welfare",
+      "category": "Central schemes",
+      "state": "Advisory / information",
+      "fullText": "full",
+      "review": "checked",
+      "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2322267&lang=1&reg=3",
+      "pointsTe": [
+        "PM ధన్-ధాన్య కృషి యోజనలో 100 ఎంపిక చేసిన జిల్లాల్లో వ్యవసాయ ఉత్పాదకత, నీటిపారుదల, రుణాలు, నిల్వ సదుపాయాలపై దృష్టి ఉంది.",
+        "ప్రకటన ప్రకారం ఖేత్ బచావో అభియాన్ అక్టోబర్ 22 నుంచి నవంబర్ 30, 2026 వరకు నిర్వహించనున్నారు.",
+        "ఇది పురోగతి సమాచారం; ప్రతి రైతుకు కొత్త నగదు ప్రయోజనం ప్రకటించిందని అర్థం కాదు. మీ జిల్లాకు వర్తించే వివరాలు అధికారిక ప్రకటనలో చూడండి."
+      ],
+      "pointsEn": [
+        "PM Dhan-Dhaanya Krishi Yojana focuses on productivity, irrigation, credit and storage in 100 selected districts.",
+        "The release says Khet Bachao Abhiyan is scheduled for 22 October–30 November 2026.",
+        "This is a progress update, not an announcement of a new cash benefit for every farmer. Check district applicability in the official release."
+      ]
+    },
+    {
+      "id": "pib-2026-10-mahila-kisan-2323959",
+      "title": "Mahila Kisan Diwas 2026: women farmers and rural livelihoods",
+      "titleTe": "మహిళా కిసాన్ దివస్ 2026: మహిళా రైతులు, గ్రామీణ జీవనోపాధి",
+      "date": "2026-10-15",
+      "addedAt": "2026-10-18",
+      "department": "Ministry of Agriculture & Farmers Welfare",
+      "category": "Other",
+      "state": "Advisory / information",
+      "fullText": "full",
+      "review": "checked",
+      "url": "https://www.pib.gov.in/PressReleaseIframePage.aspx?PRID=2323959&lang=2&reg=48",
+      "pointsTe": [
+        "మహిళా రైతుల వ్యవసాయం మరియు అనుబంధ రంగాలకు చేస్తున్న కృషిని గుర్తిస్తూ అక్టోబర్ 15న కార్యక్రమం నిర్వహించారు.",
+        "ఈ ప్రకటన అవగాహన/కార్యక్రమ సమాచారం; ప్రత్యేక సబ్సిడీ లేదా దరఖాస్తు ప్రారంభమైందని చెప్పడం లేదు.",
+        "మహిళా రైతులకు వర్తించే కొత్త పథకం లేదా ప్రయోజనం కోసం సంబంధిత శాఖ అధికారిక ప్రకటనలను పరిశీలించండి."
+      ],
+      "pointsEn": [
+        "A programme on 15 October recognised women farmers’ contributions to agriculture and allied sectors.",
+        "This is an awareness/event update; it does not announce a new subsidy or application window.",
+        "Check the relevant department’s official notices for any separate benefit or scheme."
+      ]
+    }
+  ]
 }
