@@ -71,8 +71,12 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <tr><th><label for="govTharugu">Government tharugu (kg/quintal)</label></th><td><input id="govTharugu" type="number" min="0" max="99" step="0.1" value="6"></td></tr>
 <tr><th><label for="privateTharugu">Private tharugu (kg/quintal)</label></th><td><input id="privateTharugu" type="number" min="0" max="99" step="0.1" value="4"></td></tr>
 <tr><th><label for="amali">Government amali (₹/quintal)</label></th><td><input id="amali" type="number" min="0" step="1" value="48"><small>Money charge per quintal; separate from tharugu in kg.</small></td></tr>
-<tr><th><label for="dryingLabour">Drying labour · ఎండబెట్టే కూలీ (₹ total)</label></th><td><input id="dryingLabour" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="paperRent">Paper / paperwork / other hire charges · కాగితాలు / ఇతర కిరాయి (₹ total)</label></th><td><input id="paperRent" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="govDryCost">Government drying labour (₹ total)</label></th><td><input id="govDryCost" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="govOtherCost">Government other charges (₹ total)</label></th><td><input id="govOtherCost" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="privateDryCost">Private drying labour (₹ total)</label></th><td><input id="privateDryCost" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="privateOtherCost">Private other charges (₹ total)</label></th><td><input id="privateOtherCost" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="dryingLabour">Drying labour · ఎండబెట్టే కూలీ (₹ total)</label></th><td><input  type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="paperRent"></label></th><td><input  type="number" min="0" step="100" value="0"></td></tr>
 </tbody></table></div>
 <div class="notice" id="moistureNotice" aria-live="polite">Drying loss is calculated from measured starting moisture and target moisture. If starting moisture is unknown, no automatic drying-weight deduction is applied. Enter tharugu separately and confirm whether the buyer's deduction already includes moisture loss.</div>
 </section>
@@ -87,7 +91,7 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <tr><th>Saleable quantity after moisture loss and tharugu</th><td id="govQty">—</td><td id="privateQty">—</td></tr>
 <tr><th>Moisture-related weight loss</th><td id="govDryLoss">—</td><td id="privateDryLoss">—</td></tr>
 <tr><th>Sale revenue</th><td id="govRevenue">—</td><td id="privateRevenue">—</td></tr>
-<tr><th>Amali / drying / transport / other sale charges</th><td id="govCharges">—</td><td id="privateCharges">—</td></tr>
+<tr><th>Amali / drying labour / other charges</th><td id="govCharges">—</td><td id="privateCharges">—</td></tr>
 <tr><th>Cultivation investment</th><td id="govCultivation">—</td><td id="privateCultivation">—</td></tr>
 <tr class="final-row"><th>Final profit / loss</th><td id="govTableProfit">—</td><td id="privateTableProfit">—</td></tr>
 </tbody>
@@ -106,7 +110,7 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <script>
 (() => {
 'use strict';
-const ids=['qty','govRate','privateRate','startMoisture','targetMoisture','govTharugu','privateTharugu','amali','dryingLabour','paperRent'];
+const ids=['qty','govRate','privateRate','startMoisture','targetMoisture','govTharugu','privateTharugu','amali','govDryCost','govOtherCost','privateDryCost','privateOtherCost'];
 const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
 const num=id=>Math.max(0,Number($(id).value)||0);
@@ -121,12 +125,12 @@ function calculate(){
  const gr=gq*govRate,pr=pq*privateRate;
  // Amali is money per quintal; tharugu is a weight deduction in kg per quintal.
  const amaliCost=num('amali')*gq;
- const extraCosts=num('dryingLabour')+num('paperRent');
- const ga=gr-amaliCost-extraCosts,pa=pr;
+ const govDry=num('govDryCost'),govOther=num('govOtherCost'),privateDry=num('privateDryCost'),privateOther=num('privateOtherCost');
+ const ga=gr-amaliCost-govDry-govOther,pa=pr-privateDry-privateOther;
  $('govQty').textContent=fmtQ(gq);$('privateQty').textContent=fmtQ(pq);
  $('govDryLoss').textContent=loss===null?'Not estimated':fmtQ(loss);$('privateDryLoss').textContent=loss===null?'Not estimated':fmtQ(loss);
  $('govRevenue').textContent=money(gr);$('privateRevenue').textContent=money(pr);
- $('govCharges').textContent='−'+money(amaliCost+extraCosts);$('privateCharges').textContent='₹0 entered';
+ $('govCharges').textContent='Amali '+money(amaliCost)+' · Drying '+money(govDry)+' · Other '+money(govOther);$('privateCharges').textContent='Drying '+money(privateDry)+' · Other '+money(privateOther);
  $('govTableProfit').textContent=money(ga);$('privateTableProfit').textContent=money(pa);
  const diff=pa-ga;$('difference').textContent=money(Math.abs(diff));
  $('govPerQ').textContent=money(qty?ga/qty:0);$('privatePerQ').textContent=money(qty?pa/qty:0);
@@ -137,7 +141,7 @@ function calculate(){
  else n.textContent=`Estimated drying weight loss: ${fmtQ(loss)} (${pct.toLocaleString('en-IN',{maximumFractionDigits:2})}%) to reach ${target}% from ${start}%. Tharugu is then applied separately in kg/quintal. Confirm the buyer's actual rules to avoid double-counting.`;
 }
 ids.forEach(id=>$(id).addEventListener('input',calculate));
-$('reset').addEventListener('click',()=>{const d={qty:200,govRate:2441,privateRate:2100,startMoisture:26,targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,dryingLabour:0,paperRent:0};Object.entries(d).forEach(([id,v])=>$(id).value=v);calculate();});
+$('reset').addEventListener('click',()=>{const d={qty:200,govRate:2441,privateRate:2100,startMoisture:26,targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,govDryCost:0,govOtherCost:0,privateDryCost:0,privateOtherCost:0};Object.entries(d).forEach(([id,v])=>$(id).value=v);calculate();});
 $('print').addEventListener('click',()=>window.print());
 calculate();
 })();
