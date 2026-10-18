@@ -136,10 +136,14 @@ function calculate(){
  const startMoisture=optionalNum('startMoisture'),targetMoisture=Math.min(99.9,Math.max(0.1,num('targetMoisture')));
  const gt=Math.min(99,num('govTharugu')),pt=Math.min(99,num('privateTharugu')),cultivation=totalCosts();
  let driedQty=qty,dryingLossQty=null,dryingLossPct=null;
- if(startMoisture!==null&&Number.isFinite(startMoisture)&&startMoisture>=0&&startMoisture<100&&startMoisture>targetMoisture){
-   driedQty=qty*(100-startMoisture)/(100-targetMoisture);
-   dryingLossQty=Math.max(0,qty-driedQty);
-   dryingLossPct=qty>0?dryingLossQty/qty*100:0;
+ if(startMoisture!==null&&Number.isFinite(startMoisture)&&startMoisture>=0&&startMoisture<100){
+   dryingLossQty=0;
+   dryingLossPct=0;
+   if(startMoisture>targetMoisture){
+     driedQty=qty*(100-startMoisture)/(100-targetMoisture);
+     dryingLossQty=Math.max(0,qty-driedQty);
+     dryingLossPct=qty>0?dryingLossQty/qty*100:0;
+   }
  }
  const govSaleable=Math.max(0,driedQty*(100-gt)/100),privateSaleable=Math.max(0,driedQty*(100-pt)/100);
  const govGross=govSaleable*govRate,privateGross=privateSaleable*privateRate;
