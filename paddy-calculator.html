@@ -70,43 +70,11 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <tr><th><label for="targetMoisture">Target moisture after drying (%)</label></th><td><input id="targetMoisture" type="number" min="0.1" max="99.9" step="0.1" value="17"><small>17% target is not a flat weight deduction.</small></td></tr>
 <tr><th><label for="govTharugu">Government tharugu (kg/quintal)</label></th><td><input id="govTharugu" type="number" min="0" max="99" step="0.1" value="6"></td></tr>
 <tr><th><label for="privateTharugu">Private tharugu (kg/quintal)</label></th><td><input id="privateTharugu" type="number" min="0" max="99" step="0.1" value="4"></td></tr>
+<tr><th><label for="amali">Government amali (₹/quintal)</label></th><td><input id="amali" type="number" min="0" step="1" value="48"><small>Money charge per quintal; separate from tharugu in kg.</small></td></tr>
+<tr><th><label for="dryingLabour">Drying labour · ఎండబెట్టే కూలీ (₹ total)</label></th><td><input id="dryingLabour" type="number" min="0" step="100" value="0"></td></tr>
+<tr><th><label for="paperRent">Paper / paperwork / other hire charges · కాగితాలు / ఇతర కిరాయి (₹ total)</label></th><td><input id="paperRent" type="number" min="0" step="100" value="0"></td></tr>
 </tbody></table></div>
 <div class="notice" id="moistureNotice" aria-live="polite">Drying loss is calculated from measured starting moisture and target moisture. If starting moisture is unknown, no automatic drying-weight deduction is applied. Enter tharugu separately and confirm whether the buyer's deduction already includes moisture loss.</div>
-</section>
-
-<section class="panel">
-<h2>2. పంట పెట్టుబడి · Cultivation Investment</h2>
-<p class="hint">Keep cultivation expenses and selling charges in this separate section. Open it only when you want to enter or update costs.</p>
-<button class="btn" id="toggleInvestment" type="button" aria-expanded="false" aria-controls="investmentFields">+ Enter cultivation investment &amp; sale charges</button>
-<div id="investmentFields" hidden>
-<div class="table-wrap"><table class="input-table"><thead><tr><th>Cultivation expense · పెట్టుబడి ఖర్చు</th><th>Amount (₹)</th></tr></thead><tbody>
-<tr><th><label for="seed">Seeds / nursery</label></th><td><input id="seed" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="landPrep">Land preparation / ploughing</label></th><td><input id="landPrep" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="planting">Transplanting / sowing labour</label></th><td><input id="planting" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="fertilizer">Fertilizers / manure</label></th><td><input id="fertilizer" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="pesticide">Pesticides / herbicides</label></th><td><input id="pesticide" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="water">Irrigation / electricity / diesel</label></th><td><input id="water" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="labour">Other farm labour</label></th><td><input id="labour" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="rent">Land rent / lease</label></th><td><input id="rent" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="interest">Loan interest / finance cost</label></th><td><input id="interest" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="misc">Other expenses</label></th><td><input id="misc" type="number" min="0" step="100" value="0"></td></tr>
-</tbody></table></div>
-<h3 style="margin:18px 0 8px;color:var(--green)">Transport/ / sale charges · రవాణా మరియు అమ్మకం ఖర్చులు</h3>
-<p class="hint">These are entered here, not under crop details. They are deducted only from the matching sale option.</p>
-<div class="table-wrap"><table class="input-table"><thead><tr><th>Sale-specific charge · అమ్మకం ఖర్చు</th><th>Amount</th></tr></thead><tbody>
-<tr><th><label for="amali">Government amali (₹/quintal)</label></th><td><input id="amali" type="number" min="0" step="1" value="48"></td></tr>
-<tr><th><label for="govDryCost">Government-sale drying cost (₹ total)</label></th><td><input id="govDryCost" type="number" min="0" step="100" value="30000"></td></tr>
-<tr><th><label for="govTransport">Government transport / other sale charges (₹)</label></th><td><input id="govTransport" type="number" min="0" step="100" value="0"></td></tr>
-<tr><th><label for="privateTransport">Private transport / other sale charges (₹)</label></th><td><input id="privateTransport" type="number" min="0" step="100" value="0"></td></tr>
-</tbody></table></div>
-<div class="result-grid">
-<div class="metric"><span>Total cultivation investment</span><strong id="totalCost">₹0</strong></div>
-<div class="metric"><span>Investment per original quintal</span><strong id="costPerQ">₹100</strong></div>
-<div class="metric"><span>Drying weight loss</span><strong id="dryingLossQty">Not estimated</strong></div>
-<div class="metric"><span>Saleable weight before tharugu</span><strong id="saleable">200 q</strong></div>
-</div>
-<div class="actions"><button class="btn secondary" id="reset" type="button">Reset sample values</button><button class="btn secondary" id="print" type="button">Print / Save PDF</button></div>
-</div>
 </section>
 
 <section class="panel">
@@ -138,64 +106,38 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <script>
 (() => {
 'use strict';
-const ids=['qty','govRate','privateRate','startMoisture','targetMoisture','govTharugu','privateTharugu','amali','govDryCost','govTransport','privateTransport','seed','landPrep','planting','fertilizer','pesticide','water','labour','rent','interest','misc'];
+const ids=['qty','govRate','privateRate','startMoisture','targetMoisture','govTharugu','privateTharugu','amali','dryingLabour','paperRent'];
 const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
 const num=id=>Math.max(0,Number($(id).value)||0);
 const optionalNum=id=>$(id).value.trim()===''?null:Number($(id).value);
 const fmtQ=n=>`${(Number.isFinite(n)?n:0).toLocaleString('en-IN',{maximumFractionDigits:2})} q`;
-function totalCosts(){return ['seed','landPrep','planting','fertilizer','pesticide','water','labour','rent','interest','misc'].reduce((sum,id)=>sum+num(id),0)}
 function calculate(){
- const qty=num('qty'),govRate=num('govRate'),privateRate=num('privateRate');
- const startMoisture=optionalNum('startMoisture'),targetMoisture=Math.min(99.9,Math.max(0.1,num('targetMoisture')));
- const gt=Math.min(99,num('govTharugu')),pt=Math.min(99,num('privateTharugu')),cultivation=totalCosts();
- let driedQty=qty,dryingLossQty=null,dryingLossPct=null;
- if(startMoisture!==null&&Number.isFinite(startMoisture)&&startMoisture>=0&&startMoisture<100){
-   dryingLossQty=0;
-   dryingLossPct=0;
-   if(startMoisture>targetMoisture){
-     driedQty=qty*(100-startMoisture)/(100-targetMoisture);
-     dryingLossQty=Math.max(0,qty-driedQty);
-     dryingLossPct=qty>0?dryingLossQty/qty*100:0;
-   }
- }
- const govSaleable=Math.max(0,driedQty*(100-gt)/100),privateSaleable=Math.max(0,driedQty*(100-pt)/100);
- const govGross=govSaleable*govRate,privateGross=privateSaleable*privateRate;
- const govCharges=num('amali')*govSaleable+num('govDryCost')+num('govTransport'),privateCharges=num('privateTransport');
- const govProfit=govGross-govCharges-cultivation,privateProfit=privateGross-privateCharges-cultivation;
- $('totalCost').textContent=money(cultivation);$('costPerQ').textContent=money(qty?cultivation/qty:0);
- $('saleable').textContent=fmtQ(driedQty);
- $('dryingLossQty').textContent=dryingLossQty===null?'Not estimated':`${fmtQ(dryingLossQty)} (${dryingLossPct.toLocaleString('en-IN',{maximumFractionDigits:2})}%)`;
- $('govQty').textContent=fmtQ(govSaleable);$('privateQty').textContent=fmtQ(privateSaleable);
- $('govDryLoss').textContent=dryingLossQty===null?'Not estimated':fmtQ(dryingLossQty);$('privateDryLoss').textContent=dryingLossQty===null?'Not estimated':fmtQ(dryingLossQty);
- $('govRevenue').textContent=money(govGross);$('privateRevenue').textContent=money(privateGross);
- $('govCharges').textContent='−'+money(govCharges);$('privateCharges').textContent='−'+money(privateCharges);
- $('govCultivation').textContent='−'+money(cultivation);$('privateCultivation').textContent='−'+money(cultivation);
- $('govTableProfit').textContent=money(govProfit);$('privateTableProfit').textContent=money(privateProfit);
- const diff=privateProfit-govProfit;
- $('difference').textContent=money(Math.abs(diff));$('govPerQ').textContent=money(qty?(govGross-govCharges)/qty:0);$('privatePerQ').textContent=money(qty?(privateGross-privateCharges)/qty:0);
- $('winner').textContent=qty===0?'Enter a harvest quantity greater than zero.':Math.abs(diff)<0.005?'Both options give the same estimated final profit.':`${diff>0?'Private sale':'Government procurement'} gives about ${money(Math.abs(diff))} more final profit for this harvest, based on your entries.`;
- const notice=$('moistureNotice');
- if(startMoisture===null||!Number.isFinite(startMoisture)||startMoisture<0||startMoisture>=100){
-   notice.textContent='Starting moisture is unknown, so drying loss cannot be estimated and no automatic drying-weight deduction is applied. Enter a measured reading when available. The 17% target is a quality limit, not a flat weight deduction.';
- }else if(startMoisture<=targetMoisture){
-   notice.textContent=`Starting moisture (${startMoisture}%) is at or below the target (${targetMoisture}%), so this estimate applies no drying-weight loss. The target is not a flat deduction.`;
- }else{
-   notice.textContent=`Estimated drying loss: ${fmtQ(dryingLossQty)} (${dryingLossPct.toLocaleString('en-IN',{maximumFractionDigits:2})}%) to reach ${targetMoisture}% moisture from ${startMoisture}%. Tharugu is applied separately after drying; confirm the buyer's actual deduction method to avoid double-counting.`;
- }
+ const qty=num('qty'),govRate=num('govRate'),privateRate=num('privateRate'),start=optionalNum('startMoisture'),target=Math.min(99.9,Math.max(.1,num('targetMoisture')));
+ const gt=Math.min(99,num('govTharugu')),pt=Math.min(99,num('privateTharugu'));
+ let dried=qty,loss=null,pct=null;
+ if(start!==null&&Number.isFinite(start)&&start>=0&&start<100){loss=0;pct=0;if(start>target){dried=qty*(100-start)/(100-target);loss=Math.max(0,qty-dried);pct=qty?loss/qty*100:0;}}
+ const gq=Math.max(0,dried*(100-gt)/100),pq=Math.max(0,dried*(100-pt)/100);
+ const gr=gq*govRate,pr=pq*privateRate;
+ // Amali is money per quintal; tharugu is a weight deduction in kg per quintal.
+ const amaliCost=num('amali')*gq;
+ const extraCosts=num('dryingLabour')+num('paperRent');
+ const ga=gr-amaliCost-extraCosts,pa=pr;
+ $('govQty').textContent=fmtQ(gq);$('privateQty').textContent=fmtQ(pq);
+ $('govDryLoss').textContent=loss===null?'Not estimated':fmtQ(loss);$('privateDryLoss').textContent=loss===null?'Not estimated':fmtQ(loss);
+ $('govRevenue').textContent=money(gr);$('privateRevenue').textContent=money(pr);
+ $('govCharges').textContent='−'+money(amaliCost+extraCosts);$('privateCharges').textContent='₹0 entered';
+ $('govTableProfit').textContent=money(ga);$('privateTableProfit').textContent=money(pa);
+ const diff=pa-ga;$('difference').textContent=money(Math.abs(diff));
+ $('govPerQ').textContent=money(qty?ga/qty:0);$('privatePerQ').textContent=money(qty?pa/qty:0);
+ $('winner').textContent=qty===0?'Enter a harvest quantity greater than zero.':Math.abs(diff)<.005?'Both options give the same estimated amount after entered deductions.':`${diff>0?'Private sale':'Government procurement'} gives about ${money(Math.abs(diff))} more before cultivation investment and any charges not entered here.`;
+ const n=$('moistureNotice');
+ if(start===null||!Number.isFinite(start)||start<0||start>=100)n.textContent='Starting moisture is unknown; drying loss is not estimated. The default starting moisture is 26%, and the target is 17%. The target is not a flat weight deduction.';
+ else if(start<=target)n.textContent=`Starting moisture (${start}%) is at or below target (${target}%), so no drying weight loss is applied.`;
+ else n.textContent=`Estimated drying weight loss: ${fmtQ(loss)} (${pct.toLocaleString('en-IN',{maximumFractionDigits:2})}%) to reach ${target}% from ${start}%. Tharugu is then applied separately in kg/quintal. Confirm the buyer's actual rules to avoid double-counting.`;
 }
 ids.forEach(id=>$(id).addEventListener('input',calculate));
-$('reset').addEventListener('click',()=>{
- const defaults={qty:200,govRate:2441,privateRate:2100,startMoisture:26,targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,govDryCost:30000,govTransport:0,privateTransport:0,seed:0,landPrep:0,planting:0,fertilizer:0,pesticide:0,water:0,labour:0,rent:0,interest:0,misc:0};
- Object.entries(defaults).forEach(([id,v])=>$(id).value=v);calculate();
-});
-$('toggleInvestment').addEventListener('click',()=>{
- const fields=$('investmentFields');
- const opening=fields.hidden;
- fields.hidden=!opening;
- $('toggleInvestment').setAttribute('aria-expanded',String(opening));
- $('toggleInvestment').textContent=opening?'− Hide cultivation investment & sale charges':'+ Enter cultivation investment & sale charges';
-});
+$('reset').addEventListener('click',()=>{const d={qty:200,govRate:2441,privateRate:2100,startMoisture:26,targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,dryingLabour:0,paperRent:0};Object.entries(d).forEach(([id,v])=>$(id).value=v);calculate();});
 $('print').addEventListener('click',()=>window.print());
 calculate();
 })();
