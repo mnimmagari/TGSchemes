@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-PMEAwcaSWBXA2LkN/sMrSaZX+/LGHThSo+3TcQquXbg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H1wtRssHKK5S7znYfO2WDTX8b74skB81eJygJe7FwOw='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#1F4D2B">
 <meta name="description" content="Telangana and Central Government farmer announcements in simple Telugu and English.">
 <title>రైతు సమాచారం · Telangana Farmer Alerts</title>
@@ -70,7 +70,10 @@ a{color:var(--blue)}
 .chip[aria-pressed="true"]{background:var(--leaf);border-color:var(--leaf);color:#fff}
 
 /* Alert rows */
-.list{list-style:none;margin:0;padding:0}
+.list{list-style:none;margin:0;padding:0;max-height:62vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--leaf-soft) transparent}
+.list::-webkit-scrollbar{width:8px}
+.list::-webkit-scrollbar-thumb{background:var(--leaf-soft);border-radius:8px}
+.list::-webkit-scrollbar-track{background:transparent}
 .item{border-bottom:1px solid var(--line)}
 .item:last-child{border-bottom:0}
 .item details > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:start;padding:14px 18px}
@@ -135,6 +138,7 @@ dialog::backdrop{background:#10271bb3}
 .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 
 @media (max-width:640px){
+  .list{max-height:58vh;}
   .cols{grid-template-columns:1fr}
   .body{padding-left:18px}
   .row2{grid-template-columns:1fr}
@@ -514,7 +518,7 @@ function render() {
   const shown = all
     .filter(a => topic === 'All' || a.category === topic)
     .filter(a => !q || [a.title, a.titleTe, a.department, ...a.pointsTe, ...a.pointsEn].join(' ').toLocaleLowerCase().includes(q))
-    .sort((x, y) => ((kindOf(x) === 'closed') - (kindOf(y) === 'closed')) || String(y.addedAt || y.date).localeCompare(String(x.addedAt || x.date)));
+    .sort((x, y) => ((kindOf(x) === 'closed') - (kindOf(y) === 'closed')) || String(y.date || '').localeCompare(String(x.date || '')) || String(y.addedAt || '').localeCompare(String(x.addedAt || '')));
   $('#list').innerHTML = shown.map(row).join('');
 
   const newN = all.filter(isNew).length;
