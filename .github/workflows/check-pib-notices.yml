@@ -1,0 +1,38 @@
+name: Check official PIB notices
+
+on:
+  schedule:
+    # 10:00 and 18:00 India time (UTC is 04:30 and 12:30)
+    - cron: "30 4,12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pib-notice-check
+  cancel-in-progress: false
+
+jobs:
+  check-pib:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Discover new PIB releases
+        run: python scripts/check_pib_notices.py
+      - name: Commit updated notice feed
+        run: |
+          if git diff --quiet -- data/alerts.json; then
+            echo "No feed changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/alerts.json
+          git commit -m "Refresh PIB notice feed"
+          git push
