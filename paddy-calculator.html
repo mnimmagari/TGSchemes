@@ -21,6 +21,16 @@ h2{font-size:20px;margin:0 0 4px;color:var(--green)}.hint{font-size:13px;color:v
 .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sale{border:1px solid var(--line);border-radius:14px;padding:16px}.sale h3{margin:0 0 12px;font-size:18px}.sale.gov{border-top:4px solid #c08b26}.sale.private{border-top:4px solid var(--green2)}
 .breakdown{font-size:14px}.breakdown div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line)}.breakdown span:last-child{text-align:right;font-weight:650;white-space:nowrap}.breakdown .total{font-size:16px;font-weight:800;border-bottom:0;border-top:2px solid var(--line);margin-top:5px;padding-top:11px}
 .profit{padding:12px;border-radius:10px;background:var(--pale);margin-top:12px}.profit.negative{background:#fff0ed}.profit small{display:block;color:var(--muted)}.profit strong{font-size:24px;overflow-wrap:anywhere}
+.table-wrap{width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:12px 0}
+.comparison{width:100%;border-collapse:collapse;background:#fff;font-size:14px}
+.comparison th,.comparison td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+.comparison thead th{background:var(--pale);color:var(--green);font-weight:800}
+.comparison th:first-child{text-align:left;min-width:190px}
+.comparison tbody th{font-weight:650;color:var(--ink)}
+.comparison td{font-variant-numeric:tabular-nums;white-space:nowrap}
+.comparison .final-row th,.comparison .final-row td{background:#edf5e9;font-weight:850;border-top:2px solid var(--green);font-size:15px}
+.comparison .final-row td{color:var(--green)}
+@media(max-width:600px){.comparison th,.comparison td{padding:9px 10px;font-size:12px}.comparison th:first-child{min-width:145px}}
 .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:10px;padding:11px 15px;font:inherit;font-weight:750;cursor:pointer;background:var(--green);color:white}.btn.secondary{background:#e7eee3;color:var(--green)}.btn:hover{filter:brightness(.96)}
 .notice{background:var(--amber);border-radius:10px;padding:12px;font-size:13px;color:#5c481f;margin-top:12px}.winner{font-weight:800;color:var(--green);margin-top:12px}
 footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(--green)}
@@ -39,7 +49,7 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <p class="intro">Enter your own costs and current buyer offers. Calculations update automatically. All amounts are in Indian rupees (₹).</p>
 
 <section class="panel">
-<h2>1. Crop and sale details · పంట వివరాలు</h2><p class="hint">Change the sample values to match your farm.</p>
+<h2>1. Crop and sale details · పంట వివరాలు</h2><p class="hint">Enter crop quantity, selling rates and weight deductions here. Cultivation expenses and sale charges are entered separately below.</p>
 <div class="grid">
 <div class="field"><label for="qty">Harvest quantity (quintals)</label><input id="qty" type="number" min="0" step="0.01" value="200"></div>
 <div class="field"><label for="govRate">Government price (₹/quintal)</label><input id="govRate" type="number" min="0" step="1" value="2460"></div>
@@ -47,17 +57,14 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <div class="field"><label for="dryLoss">Government drying weight loss (%)</label><input id="dryLoss" type="number" min="0" max="99" step="0.1" value="10"><small>Estimated weight lost while drying; enter actual expected loss.</small></div>
 <div class="field"><label for="govTharugu">Government tharugu (kg/quintal)</label><input id="govTharugu" type="number" min="0" max="99" step="0.1" value="6"></div>
 <div class="field"><label for="privateTharugu">Private tharugu (kg/quintal)</label><input id="privateTharugu" type="number" min="0" max="99" step="0.1" value="4"></div>
-<div class="field"><label for="amali">Government amali (₹/quintal)</label><input id="amali" type="number" min="0" step="1" value="48"></div>
-<div class="field"><label for="govDryCost">Government-sale drying cost (₹ total)</label><input id="govDryCost" type="number" min="0" step="100" value="30000"></div>
-<div class="field"><label for="govTransport">Government sale transport / other charges (₹)</label><input id="govTransport" type="number" min="0" step="100" value="0"></div>
-<div class="field"><label for="privateTransport">Private sale transport / other charges (₹)</label><input id="privateTransport" type="number" min="0" step="100" value="0"></div>
+
 </div>
 <div class="notice">Assumption: drying weight loss and tharugu are treated as separate deductions. Confirm with the procurement centre whether tharugu is applied separately. Government price eligibility/grade and any bonus must be verified locally.</div>
 </section>
 
 <section class="panel">
 <h2>2. Total cultivation investment · పంట పెట్టుబడి</h2>
-<p class="hint">Enter the total amount spent on this crop (not per acre), including expenses already paid.</p>
+<p class="hint">Enter your cultivation expenses and selling-related charges here. The calculator keeps cultivation investment separate from sale deductions to avoid confusion.</p>
 <div class="cost-list">
 <div class="field"><label for="seed">Seeds / nursery (₹)</label><input class="cost" id="seed" type="number" min="0" step="100" value="0"></div>
 <div class="field"><label for="landPrep">Land preparation / ploughing (₹)</label><input class="cost" id="landPrep" type="number" min="0" step="100" value="0"></div>
@@ -71,6 +78,14 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <div class="field"><label for="interest">Loan interest / finance cost (₹)</label><input class="cost" id="interest" type="number" min="0" step="100" value="0"></div>
 <div class="field"><label for="misc">Other expenses (₹)</label><input class="cost" id="misc" type="number" min="0" step="100" value="0"></div>
 </div>
+<h3 style="margin:18px 0 8px;color:var(--green)">Transport / sale charges · రవాణా మరియు అమ్మకం ఖర్చులు</h3>
+<p class="hint">These are entered here, not under crop details. They are deducted only from the matching sale option.</p>
+<div class="cost-list">
+<div class="field"><label for="amali">Government amali (₹/quintal)</label><input id="amali" type="number" min="0" step="1" value="48"></div>
+<div class="field"><label for="govDryCost">Government-sale drying cost (₹ total)</label><input id="govDryCost" type="number" min="0" step="100" value="30000"></div>
+<div class="field"><label for="govTransport">Government transport / other sale charges (₹)</label><input id="govTransport" type="number" min="0" step="100" value="0"></div>
+<div class="field"><label for="privateTransport">Private transport / other sale charges (₹)</label><input id="privateTransport" type="number" min="0" step="100" value="0"></div>
+</div>
 <div class="result-grid">
 <div class="metric"><span>Total cultivation investment</span><strong id="totalCost">₹20,000</strong></div>
 <div class="metric"><span>Investment per original quintal</span><strong id="costPerQ">₹100</strong></div>
@@ -82,17 +97,17 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <section class="panel">
 <h2>3. Compare final results · అమ్మకం పోలిక</h2>
 <p class="hint">Cultivation expenses are deducted from both options. Government-specific drying and amali, and sale-specific transport, are deducted only from that option.</p>
-<div class="compare">
-<article class="sale gov">
-<h3>🏢 Government procurement</h3>
-<div class="breakdown" id="govBreakdown"></div>
-<div class="profit" id="govProfitBox"><small>Net profit / loss after all entered costs</small><strong id="govProfit">₹—</strong></div>
-</article>
-<article class="sale private">
-<h3>🤝 Private buyer</h3>
-<div class="breakdown" id="privateBreakdown"></div>
-<div class="profit" id="privateProfitBox"><small>Net profit / loss after all entered costs</small><strong id="privateProfit">₹—</strong></div>
-</article>
+<div class="table-wrap">
+<table class="comparison">
+<thead><tr><th>Calculation · లెక్క</th><th>Government · ప్రభుత్వం</th><th>Private buyer · ప్రైవేట్</th></tr></thead>
+<tbody>
+<tr><th>Saleable quantity</th><td id="govQty">—</td><td id="privateQty">—</td></tr>
+<tr><th>Sale revenue</th><td id="govRevenue">—</td><td id="privateRevenue">—</td></tr>
+<tr><th>Amali / drying / transport / other sale charges</th><td id="govCharges">—</td><td id="privateCharges">—</td></tr>
+<tr><th>Cultivation investment</th><td id="govCultivation">—</td><td id="privateCultivation">—</td></tr>
+<tr class="final-row"><th>Final profit / loss</th><td id="govTableProfit">—</td><td id="privateTableProfit">—</td></tr>
+</tbody>
+</table>
 </div>
 <p class="winner" id="winner" aria-live="polite"></p>
 <div class="result-grid">
@@ -113,40 +128,31 @@ const money = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR
 const num = id => Math.max(0, Number($(id).value) || 0);
 const fmtQ = n => `${(Number.isFinite(n)?n:0).toLocaleString('en-IN',{maximumFractionDigits:2})} q`;
 function totalCosts(){return ['seed','landPrep','planting','fertilizer','pesticide','water','labour','harvest','rent','interest','misc'].reduce((sum,id)=>sum+num(id),0)}
-function line(label,value){return `<div><span>${label}</span><span>${value}</span></div>`}
 function calculate(){
  const qty=num('qty'), govRate=num('govRate'), privateRate=num('privateRate');
  const dryLoss=Math.min(99,num('dryLoss')), gt=Math.min(99,num('govTharugu')), pt=Math.min(99,num('privateTharugu'));
- const common=totalCosts(), costPerQ=qty?common/qty:0;
+ const cultivation=totalCosts();
  const govSaleable=Math.max(0,qty*(100-dryLoss-gt)/100);
  const privateSaleable=Math.max(0,qty*(100-pt)/100);
  const govGross=govSaleable*govRate, privateGross=privateSaleable*privateRate;
- const govDeductions=num('amali')*qty+num('govDryCost')+num('govTransport');
- const privateDeductions=num('privateTransport');
- const govProfit=govGross-govDeductions-common, privateProfit=privateGross-privateDeductions-common;
- $('totalCost').textContent=money(common); $('costPerQ').textContent=money(costPerQ); $('saleable').textContent=fmtQ(qty*(100-dryLoss)/100);
- $('govBreakdown').innerHTML =
-  line('Original harvested quantity',fmtQ(qty))+
-  line('Weight after drying & tharugu',fmtQ(govSaleable))+
-  line('Sale revenue at entered rate',money(govGross))+
-  line('Amali',`−${money(num('amali')*qty)}`)+
-  line('Drying expense',`−${money(num('govDryCost'))}`)+
-  line('Transport / other sale charges',`−${money(num('govTransport'))}`)+
-  line('Cultivation investment',`−${money(common)}`)+
-  `<div class="total"><span>Final profit / loss</span><span>${money(govProfit)}</span></div>`;
- $('privateBreakdown').innerHTML =
-  line('Original harvested quantity',fmtQ(qty))+
-  line('Weight after private tharugu',fmtQ(privateSaleable))+
-  line('Sale revenue at entered rate',money(privateGross))+
-  line('Transport / other sale charges',`−${money(privateDeductions)}`)+
-  line('Cultivation investment',`−${money(common)}`)+
-  `<div class="total"><span>Final profit / loss</span><span>${money(privateProfit)}</span></div>`;
+ const govCharges=num('amali')*qty+num('govDryCost')+num('govTransport');
+ const privateCharges=num('privateTransport');
+ const govProfit=govGross-govCharges-cultivation, privateProfit=privateGross-privateCharges-cultivation;
+ const totalSaleCharges=govCharges+privateCharges;
+ $('totalCost').textContent=money(cultivation);
+ $('costPerQ').textContent=money(qty?cultivation/qty:0);
+ $('saleable').textContent=fmtQ(qty*(100-dryLoss)/100);
+ $('govQty').textContent=fmtQ(govSaleable); $('privateQty').textContent=fmtQ(privateSaleable);
+ $('govRevenue').textContent=money(govGross); $('privateRevenue').textContent=money(privateGross);
+ $('govCharges').textContent='−'+money(govCharges); $('privateCharges').textContent='−'+money(privateCharges);
+ $('govCultivation').textContent='−'+money(cultivation); $('privateCultivation').textContent='−'+money(cultivation);
+ $('govTableProfit').textContent=money(govProfit); $('privateTableProfit').textContent=money(privateProfit);
  $('govProfit').textContent=money(govProfit); $('privateProfit').textContent=money(privateProfit);
  $('govProfitBox').classList.toggle('negative',govProfit<0); $('privateProfitBox').classList.toggle('negative',privateProfit<0);
  const diff=privateProfit-govProfit;
  $('difference').textContent=money(Math.abs(diff));
- $('govPerQ').textContent=money(qty? (govGross-govDeductions)/qty:0);
- $('privatePerQ').textContent=money(qty? (privateGross-privateDeductions)/qty:0);
+ $('govPerQ').textContent=money(qty?(govGross-govCharges)/qty:0);
+ $('privatePerQ').textContent=money(qty?(privateGross-privateCharges)/qty:0);
  $('winner').textContent=qty===0?'Enter a harvest quantity greater than zero.':Math.abs(diff)<0.005?'Both options give the same estimated final profit.':`${diff>0?'Private sale':'Government procurement'} gives about ${money(Math.abs(diff))} more final profit for this harvest, based on your entries.`;
 }
 ids.forEach(id=>$(id).addEventListener('input',calculate));
