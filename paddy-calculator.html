@@ -64,8 +64,10 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 </section>
 
 <section class="panel">
-<h2>2. Total cultivation investment · పంట పెట్టుబడి</h2>
-<p class="hint">Enter your cultivation expenses and selling-related charges here. The calculator keeps cultivation investment separate from sale deductions to avoid confusion.</p>
+<h2>2. పంట పెట్టుబడి · Cultivation Investment</h2>
+<p class="hint">Keep cultivation expenses and selling charges in this separate section. Open it only when you want to enter or update costs.</p>
+<button class="btn" id="toggleInvestment" type="button" aria-expanded="false" aria-controls="investmentFields">+ Enter cultivation investment &amp; sale charges</button>
+<div id="investmentFields" hidden>
 <div class="cost-list">
 <div class="field"><label for="seed">Seeds / nursery (₹)</label><input class="cost" id="seed" type="number" min="0" step="100" value="0"></div>
 <div class="field"><label for="landPrep">Land preparation / ploughing (₹)</label><input class="cost" id="landPrep" type="number" min="0" step="100" value="0"></div>
@@ -87,12 +89,13 @@ footer{padding:0 14px 28px;color:var(--muted);font-size:13px}footer a{color:var(
 <div class="field"><label for="privateTransport">Private transport / other sale charges (₹)</label><input id="privateTransport" type="number" min="0" step="100" value="0"></div>
 </div>
 <div class="result-grid">
-<div class="metric"><span>Total cultivation investment</span><strong id="totalCost">₹20,000</strong></div>
+<div class="metric"><span>Total cultivation investment</span><strong id="totalCost">₹0</strong></div>
 <div class="metric"><span>Investment per original quintal</span><strong id="costPerQ">₹100</strong></div>
 <div class="metric"><span>Drying weight loss</span><strong id="dryingLossQty">Not estimated</strong></div>
 <div class="metric"><span>Saleable weight before tharugu</span><strong id="saleable">200 q</strong></div>
 </div>
 <div class="actions"><button class="btn secondary" id="reset" type="button">Reset sample values</button><button class="btn secondary" id="print" type="button">Print / Save PDF</button></div>
+</div>
 </section>
 
 <section class="panel">
@@ -174,6 +177,13 @@ ids.forEach(id=>$(id).addEventListener('input',calculate));
 $('reset').addEventListener('click',()=>{
  const defaults={qty:200,govRate:2460,privateRate:2100,startMoisture:'',targetMoisture:17,govTharugu:6,privateTharugu:4,amali:48,govDryCost:30000,govTransport:0,privateTransport:0,seed:0,landPrep:0,planting:0,fertilizer:0,pesticide:0,water:0,labour:0,rent:0,interest:0,misc:0};
  Object.entries(defaults).forEach(([id,v])=>$(id).value=v);calculate();
+});
+$('toggleInvestment').addEventListener('click',()=>{
+ const fields=$('investmentFields');
+ const opening=fields.hidden;
+ fields.hidden=!opening;
+ $('toggleInvestment').setAttribute('aria-expanded',String(opening));
+ $('toggleInvestment').textContent=opening?'− Hide cultivation investment & sale charges':'+ Enter cultivation investment & sale charges';
 });
 $('print').addEventListener('click',()=>window.print());
 calculate();
